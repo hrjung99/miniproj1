@@ -2,7 +2,9 @@ package method;
 
 public class Verification {
 	
-	//아이디 확인
+	//아이디 존재 확인
+	
+	
 	//비밀번호 확인
 	
 	//회원 탈퇴 여부 확인
