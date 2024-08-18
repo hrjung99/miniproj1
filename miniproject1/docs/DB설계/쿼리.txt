@@ -139,7 +139,7 @@ COMMIT;
 
 
 
-
+DROP TABLE TB_BOARD;
 
 
 -- 게시물
@@ -180,3 +180,59 @@ INSERT INTO TB_BOARD (user_no, board_title, board_content) VALUES (1, '다섯 �
 
 COMMIT;
 SELECT * FROM TB_BOARD;
+
+
+
+
+
+
+
+-- BOARD CRUD
+-- list
+SELECT B.BOARD_NO,
+B.USER_NO, 
+       U.USER_NAME AS BOARD_WRITER, 
+       B.BOARD_TITLE, 
+       B.BOARD_VIEW_CNT, 
+       CASE 
+           WHEN B.BOARD_REG_DATE >= (SYSDATE-1) THEN TO_CHAR(B.BOARD_REG_DATE, 'HH24:MI')
+           ELSE TO_CHAR(B.BOARD_REG_DATE, 'YYYY-MM-DD')
+       END AS BOARD_REG_DATE
+FROM TB_BOARD B 
+JOIN TB_USER U ON B.USER_NO = U.USER_NO
+ORDER BY B.BOARD_NO ASC;
+
+-- delete
+DELETE FROM TB_BOARD WHERE board_no = '1';
+-- view
+SELECT B.BOARD_NO,
+B.USER_NO, 
+       U.USER_NAME AS BOARD_WRITER, 
+       B.BOARD_TITLE, 
+       B.BOARD_VIEW_CNT, B.BOARD_REG_DATE
+FROM TB_BOARD B 
+JOIN TB_USER U ON B.USER_NO = U.USER_NO
+WHERE B.BOARD_NO = 1;
+ORDER BY B.BOARD_NO ASC;
+
+
+UPDATE TB_BOARD SET BOARD_VIEW_CNT = BOARD_VIEW_CNT+1
+WHERE BOARD_NO = 1;
+-- insert
+INSERT INTO TB_BOARD (user_no, board_title, board_content) VALUES (1, '첫 번째 게시물', '이것은 첫 번째 게시물의 내용입니다.');
+-- update
+UPDATE TB_BOARD SET BOARD_TITLE = '게시물제목1', BOARD_CONTENT = '게시물내용1'WHERE BOARD_NO = 1;
+SELECT * FROM TB_BOARD TB;
+COMMIT;
+
+
+
+
+
+-- USER CRUD
+-- list
+
+-- view
+-- delete
+-- insert
+-- update

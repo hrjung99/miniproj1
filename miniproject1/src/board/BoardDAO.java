@@ -87,7 +87,7 @@ public class BoardDAO {
 					UPDATE TB_BOARD SET 
 					BOARD_TITLE = ?, 
 					BOARD_CONTENT = ?
-					WHERE BOARD_NO = ?;
+					WHERE BOARD_NO = ?
 					""");
 
 		} catch (Exception e) {
