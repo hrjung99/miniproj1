@@ -1,6 +1,10 @@
 package main;
 
 public class Miniproj1 {
+	//첫 화면
+	private static void printMainSecreen() {
+		
+	}
 
 	public static void main(String[] args) {
 		
