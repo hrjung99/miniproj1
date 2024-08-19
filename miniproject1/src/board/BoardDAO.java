@@ -97,7 +97,7 @@ public class BoardDAO {
 	}
 	
 	//board list
-	public List<BoardVO> boardList(BoardVO boardVO){
+	public static List<BoardVO> boardList(BoardVO boardVO){
 		List boardList = new ArrayList<BoardVO>();
 		
 		try {
@@ -121,7 +121,7 @@ public class BoardDAO {
 	}
 	
 	//board delete
-	public String boardDelete(BoardVO boardVO) {
+	public static String boardDelete(BoardVO boardVO) {
 		int updated = 0;
 		//오류&성공 메세지 리턴을 위한 변수
 		String message ="";
@@ -151,7 +151,7 @@ public class BoardDAO {
 	
 	
 	//board view
-	public BoardVO boardView(BoardVO boardVO) {
+	public static BoardVO boardView(BoardVO boardVO) {
 		BoardVO board = null;
 		int updated = 0;
 		int board_no = board.getBoard_no();
@@ -193,7 +193,7 @@ public class BoardDAO {
 	
 	
 	//board insert
-	public String boardInsert (BoardVO boardVO) {
+	public static String boardInsert (BoardVO boardVO) {
 		UserVO userVO = new UserVO();
 		String message = "";
 		int updated = 0;
@@ -225,7 +225,7 @@ public class BoardDAO {
 	}
 	
 	//board update
-	public String  boardUpdate(BoardVO boardVO) {
+	public static String  boardUpdate(BoardVO boardVO) {
 		String message = "";
 		int updated = 0;
 		

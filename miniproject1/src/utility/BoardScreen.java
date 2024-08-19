@@ -1,6 +1,7 @@
 package utility;
 
 import board.BoardVO;
+import user.UserVO;
 
 public class BoardScreen {
 	//콘솔 디자인
@@ -9,7 +10,7 @@ public class BoardScreen {
 	private static int padding = (width - title.length()) / 2;
 	
 	//게시물 목록 화면
-	public static void printBoardListScreen() {
+	public static void printBoardListScreen(UserVO currentUserInfo) {
 		title = "[게시물 목록]";
 		System.out.println("=".repeat(width));
 		System.out.println(" ".repeat(padding) + title);

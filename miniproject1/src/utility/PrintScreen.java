@@ -3,6 +3,7 @@ package utility;
 import java.util.Scanner;
 
 import board.BoardVO;
+import user.UserDAO;
 import user.UserVO;
 
 public class PrintScreen {
@@ -35,7 +36,7 @@ public class PrintScreen {
     
     
     // 각 제목 출력 메소드
-    private static void printTitle(String title) {
+    public static void printTitle(String title) {
         int padding = (WIDTH - title.length()) / 2;
         System.out.println("=".repeat(WIDTH));
         System.out.println(" ".repeat(padding) + title);
@@ -55,7 +56,8 @@ public class PrintScreen {
 			System.out.println("4. 비밀번호 초기화");
 			System.out.println("5. 프로그램 종료");
 			System.out.println();
-			System.out.print("원하는 기능을 선택하십시오.");
+			System.out.println("원하는 기능을 선택하십시오.");
+			System.out.print("기능 번호 : ");
 			input = scan_input.nextLine();
 			switch (input) {
 			case "1":
@@ -72,12 +74,12 @@ public class PrintScreen {
 				break;
 			case "3":
 				System.out.println("아이디 찾기 화면으로 이동합니다.");
-				UserScreen.FindId();
+				UserDAO.FindId();
 				isValid = true;
 				break;
 			case "4":
 				System.out.println("비밀번호 초기화 화면으로 이동합니다.");
-				UserScreen.ResetPass();
+				UserDAO.ResetPass();
 				isValid = true;
 			case "5":
 				System.out.println("프로그램을 종료합니다. 이용해주셔서 감사합니다.");
@@ -85,6 +87,7 @@ public class PrintScreen {
 				System.exit(0);
 				break;
 			default:
+				System.out.println();
 				System.out.println("잘못된 입력입니다. 다시 시도하십시오.");
 				break;
 			}
