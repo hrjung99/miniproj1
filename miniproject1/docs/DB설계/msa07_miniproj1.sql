@@ -60,13 +60,13 @@ CREATE TABLE TB_LOGIN_HIS (
 his_no NUMBER PRIMARY KEY,
 user_no	NUMBER NOT NULL,
 his_login_date DATE NOT NULL,
-his_logout_date ,
+his_logout_date DATE,
  CONSTRAINT fk_login_his_user_no FOREIGN KEY(user_no) REFERENCES TB_USER(user_no)
 );
 
 -- 잘못 생각한 옵션 수정 (로그인 시 행은 추가 되지만 로그아웃 데이터는 비어있을 수 밖에 없다.)
-ALTER TABLE TB_LOGIN_HIS
-MODIFY (his_logout_date DATE NULL);
+--ALTER TABLE TB_LOGIN_HIS
+--MODIFY (his_logout_date DATE NULL);
 
 
 -- 로그인 이력 번호 자동 증가
@@ -136,12 +136,6 @@ COMMIT;
 
 
 
-
-
-
-DROP TABLE TB_BOARD;
-
-
 -- 게시물
 -- 게시물 테이블 생성
 CREATE TABLE TB_BOARD (
@@ -151,8 +145,12 @@ board_title VARCHAR2(100)NOT NULL,
 board_content VARCHAR2(500) NOT NULL,
 board_view_cnt NUMBER DEFAULT 0 NOT NULL,
 board_reg_date DATE DEFAULT SYSDATE NOT NULL,
+board_pass VARCHAR2(100) NOT NULL,
  CONSTRAINT fk_board_user_no FOREIGN KEY(user_no) REFERENCES TB_USER(user_no)
 );
+
+-- 게시물 비밀 번호 컬럼 추가
+-- ALTER TABLE TB_BOARD  ADD board_pass VARCHAR2(255) NOT NULL;
 
 
 -- 게시물 번호 자동증가
@@ -172,11 +170,11 @@ END;
 
 
 -- 테스트
-INSERT INTO TB_BOARD (user_no, board_title, board_content) VALUES (1, '첫 번째 게시물', '이것은 첫 번째 게시물의 내용입니다.');
-INSERT INTO TB_BOARD (user_no, board_title, board_content) VALUES (1, '두 번째 게시물', '이것은 두 번째 게시물의 내용입니다.');
-INSERT INTO TB_BOARD (user_no, board_title, board_content) VALUES (1, '세 번째 게시물', '이것은 세 번째 게시물의 내용입니다.');
-INSERT INTO TB_BOARD (user_no, board_title, board_content) VALUES (1, '네 번째 게시물', '이것은 네 번째 게시물의 내용입니다.');
-INSERT INTO TB_BOARD (user_no, board_title, board_content) VALUES (1, '다섯 번째 게시물', '이것은 다섯 번째 게시물의 내용입니다.');
+INSERT INTO TB_BOARD (user_no, board_title, board_content, board_pass) VALUES (1, '첫 번째 게시물', '이것은 첫 번째 게시물의 내용입니다.','1004');
+INSERT INTO TB_BOARD (user_no, board_title, board_content, board_pass) VALUES (1, '두 번째 게시물', '이것은 두 번째 게시물의 내용입니다.','1004');
+INSERT INTO TB_BOARD (user_no, board_title, board_content, board_pass) VALUES (1, '세 번째 게시물', '이것은 세 번째 게시물의 내용입니다.','1004');
+INSERT INTO TB_BOARD (user_no, board_title, board_content, board_pass) VALUES (1, '네 번째 게시물', '이것은 네 번째 게시물의 내용입니다.','1004');
+INSERT INTO TB_BOARD (user_no, board_title, board_content, board_pass) VALUES (1, '다섯 번째 게시물', '이것은 다섯 번째 게시물의 내용입니다.','1004');
 
 COMMIT;
 SELECT * FROM TB_BOARD;
@@ -239,7 +237,26 @@ SELECT * FROM TB_USER;
 INSERT INTO TB_USER 
 (user_id, user_pass, user_name, user_phone, user_addr, user_sex) 
 VALUES 
-('testuser', '1004', 'user01', '010-1234-5678', '서울특별시', '여');
+('testuser', '1004', 'user01', '01012345678', '서울특별시', '여');
 
 
 -- update
+
+--아이디 중복 체크
+SELECT * FROM TB_USER WHERE TB_USER.USER_ID = 'testuser';
+-- 비밀번호 인증 체크
+SELECT * FROM TB_USER WHERE USER_ID = 'testuser' AND USER_PASS = '1004';
+
+-- 최근 로그인 update
+UPDATE TB_USER
+SET user_login_recent = SYSDATE
+WHERE user_id = 'testuser';
+
+
+-- 최근 로그아웃 update
+UPDATE TB_USER
+SET user_logout_recent = SYSDATE 
+WHERE user_id = 'testuser';
+
+SELECT * FROM TB_USER;
+					

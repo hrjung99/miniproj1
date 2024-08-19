@@ -20,8 +20,6 @@ public class Miniproj1 {
 		PrintScreen.printMainSecreen();
 		
 		
-		
-		
 	}
 
 }

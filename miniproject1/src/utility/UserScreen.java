@@ -1,5 +1,6 @@
 package utility;
 
+import java.util.List;
 import java.util.Scanner;
 
 import board.BoardVO;
@@ -11,7 +12,7 @@ import user.UserVO;
 public class UserScreen {
 	//콘솔 디자인
 	private static String title = "";
-	private static final int  width = 80; // 구분선의 전체 길이
+	private static final int  width = 120; // 구분선의 전체 길이
 	private static int padding = (width - title.length()) / 2;
 
 	// 스캐너 선언
@@ -30,8 +31,38 @@ public class UserScreen {
 	
 	//회원 목록 화면
 	public static void printUserListScreen() {
-		
+		PrintScreen.printTitle("[회원 목록]");
+		// 헤더 출력
+        String header = String.format("| %-8s | %-10s | %-10s | %-15s | %-20s | %-4s | %-6s | %-8s | %-19s | %-19s |",
+                                      "회원번호", "아이디", "이름", "전화번호", "주소", "성별", "권한", "탈퇴여부", "최근 로그인", "최근 로그아웃");
+        System.out.println(header);
+        System.out.println("-".repeat(width));
+
+        // 사용자 목록 가져오기
+        List<UserVO> userList = UserDAO.userList(new UserVO());
+
+        // 각 사용자 정보 출력
+        for (UserVO user : userList) {
+            String row = String.format("| %-8d | %-10s | %-10s | %-15s | %-20s | %-4s | %-6s | %-8s | %-19s | %-19s |",
+                                       user.getUser_no(),
+                                       user.getUser_id(),
+                                       user.getUser_name(),
+                                       user.getUser_phone(),
+                                       user.getUser_addr(),
+                                       user.getUser_sex(),
+                                       user.getUser_role(),
+                                       user.getUser_deleteYN(),
+                                       user.getUser_login_recent(),
+                                       user.getUser_logout_recent());
+            System.out.println(row);
+        }
+
+        // 표 끝 부분 출력
+        System.out.println("=".repeat(width));
 	}
+	
+	
+	
 	
 	// 마이페이지 화면
 	public static void printUserViewScreen(UserVO userVO) {
@@ -147,7 +178,7 @@ public class UserScreen {
 	// 로그인
 	public static void printLoginScreen() {
 		PrintScreen.printTitle("[로그인]");
-		boolean auth = false;
+		UserVO userInfo = new UserVO();
 		String message = "";
 
 		while (true) {
@@ -155,9 +186,6 @@ public class UserScreen {
 			String inputId = scan_input.nextLine();
 			System.out.print("비밀번호 : ");
 			String inputPass = scan_input.nextLine();
-
-			userInfo.setUser_id(inputId);
-			userInfo.setUser_pass(inputPass);
 
 			System.out.println("1. 로그인");
 			System.out.println("2. 다시 입력");
@@ -170,33 +198,36 @@ public class UserScreen {
 			switch (choice) {
 			// 1 일 경우 로그인 시도
 			case "1":
-				auth = UserDAO.passwordAuthenticate(userInfo.getUser_id(), userInfo.getUser_pass());
+				userInfo = UserDAO.userLogin(inputId);
+				String user_id = userInfo.getUser_id();
+				String user_pass = userInfo.getUser_pass();
 
-				if (auth) {
-					// 로그인 성공
-					message = UserDAO.userRecentLoginUpdate(userInfo.getUser_id());
-					if (message.equals("성공")) {
-						System.out.println("로그인에 성공했습니다.");
-						
-						if(userInfo.getUser_role().equals("admin")) {
-							printListAfterLoginForAdmin(userInfo);
-						} else if (userInfo.getUser_role().equals("user")) {
-							printListAfterLogin(userInfo);
+				if (userInfo != null) {
+					if (user_pass.equals(inputPass)) {
+						// 로그인 성공
+						message = UserDAO.userRecentLoginUpdate(userInfo.getUser_id());
+						if (message.equals("성공")) {
+							UserDAO.userRecentLoginUpdate(user_id);
+							System.out.println("로그인에 성공했습니다.");
+							if (userInfo.getUser_role().equals("admin")) {
+								printListAfterLoginForAdmin(userInfo);
+							} else if (userInfo.getUser_role().equals("user")) {
+								printListAfterLogin(userInfo);
+							}
+							return;
+						} else { // 아이디 비번 틀림 : 로그인 실패
+							System.out.println("아이디 혹은 비밀번호가 유효하지 않습니다.");
+							System.out.println("로그인 정보를 다시 입력해 주세요.");
+							System.out.println();
+							break;
 						}
-						return;
-					} else {
+					} else { // 로그인 실패
 						System.out.println("아이디 혹은 비밀번호가 유효하지 않습니다.");
 						System.out.println("로그인 정보를 다시 입력해 주세요.");
 						System.out.println();
-						break;
 					}
-				} else {
-					System.out.println("아이디 혹은 비밀번호가 유효하지 않습니다.");
-					System.out.println("로그인 정보를 다시 입력해 주세요.");
-					System.out.println();
-					break;
 				}
-				
+
 			// 2일 경우 로그인 정보 다시 입력
 			case "2":
 				break;
@@ -224,7 +255,7 @@ public class UserScreen {
 
 	// 로그인 성공 후 화면
 	public static void printListAfterLogin(UserVO currentUserInfo) {
-
+		PrintScreen.printTitle("[메뉴]");
 		System.out.println("1. 나의 정보 확인");
 		System.out.println("2. 게시물 목록");
 		System.out.println("3. 로그아웃");
@@ -266,7 +297,7 @@ public class UserScreen {
 	
 	// 로그인 성공 후 화면 for admin
 	public static void printListAfterLoginForAdmin(UserVO currentUserInfo) {
-
+		PrintScreen.printTitle("[메뉴 - 관리자]");
 		System.out.println("1. 나의 정보 확인");
 		System.out.println("2. 게시물 목록");
 		System.out.println("3. 회원 목록");
@@ -315,4 +346,15 @@ public class UserScreen {
 		}
 
 	}
+	public static void findId() {
+		PrintScreen.printTitle("[아이디 찾기]");
+		System.out.print("이름 : ");
+		String input_name = scan_input.nextLine();
+		
+		System.out.print("전화번호 : ");
+		String input_phone = scan_input.nextLine();
+		
+		
+	}
+
 }

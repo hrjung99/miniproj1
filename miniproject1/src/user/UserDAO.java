@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.mysql.cj.xdevapi.Result;
 
+import board.BoardVO;
 import user.UserVO;
 
 public class UserDAO {
@@ -28,7 +29,7 @@ public class UserDAO {
 	private static PreparedStatement userIdValidPsmt = null;
 	
 	//비밀번호 검증
-	private static PreparedStatement userPassAuthPsmt = null;
+	private static PreparedStatement userLoginPsmt = null;
 	
 	//최근 로그인/로그아웃 업데이트
 	private static PreparedStatement userRecentLoginPsmt = null;
@@ -60,10 +61,8 @@ public class UserDAO {
 			
 			// user view
 			userViewPsmt = conn.prepareStatement("""
-
+					SELECT * FROM TB_USER WHERE USER_NO = ?
 					""");
-			
-			
 			// user insert
 			userInsertPsmt = conn.prepareStatement("""
 					INSERT INTO TB_USER 
@@ -78,18 +77,15 @@ public class UserDAO {
 //
 //					""");
 			
+			userLoginPsmt = conn.prepareStatement("""
+					SELECT * FROM TB_USER WHERE USER_ID = ?
+					""");
+			
 			
 			//아이디 존재하는지 체크
 			userIdValidPsmt = conn.prepareStatement("""
 					SELECT * FROM TB_USER WHERE TB_USER.USER_ID = ?
 					""");
-			
-			
-			//비밀번호 검증
-			userPassAuthPsmt = conn.prepareStatement("""
-					SELECT * FROM TB_USER WHERE USER_ID = ? AND USER_PASS = ?
-					""");
-			
 			
 			//최근 로그인/로그아웃 업데이트
 			userRecentLoginPsmt = conn.prepareStatement("""
@@ -115,13 +111,26 @@ public class UserDAO {
 		List userList = new ArrayList<UserVO>();
 
 		try {
-//			Result rs = userListPsmt.executeQuery();
-
+			ResultSet rs = userListPsmt.executeQuery();
+			while(rs.next()) { // 행이 여러개니까 다음행 있으면 리스트에 담고 없으면 끝내는 코드
+				UserVO user = new UserVO(
+						rs.getInt("user_no")
+						,rs.getString("user_id")
+						,rs.getString("user_pass")
+						,rs.getString("user_name")
+						,rs.getString("user_phone")
+						,rs.getString("user_addr")
+						,rs.getString("user_sex")
+						,rs.getString("user_role")
+						,rs.getString("user_deleteYN")
+						,rs.getString("user_login_recent")
+						,rs.getString("user_logout_recent"));
+				userList.add(user);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
 		}
-
 		return userList;
 	}
 
@@ -146,9 +155,9 @@ public class UserDAO {
 	public static UserVO userView(UserVO userVO) {
 		UserVO user = null;
 		try {
-			userViewPsmt.setInt(1, userVO.getUser_no());
+			userIdValidPsmt.setInt(1, userVO.getUser_no());
 			
-			ResultSet rs = userViewPsmt.executeQuery();
+			ResultSet rs = userIdValidPsmt.executeQuery();
 			if(rs.next()) {
 				user = new UserVO(
 						rs.getInt("user_no")
@@ -240,10 +249,40 @@ public class UserDAO {
 		return isAvailable;
 	}
 	
-	//use password정확한지 확인
-	public static boolean passwordAuthenticate (String user_id, String user_pass) {
-		boolean isAuth = false;
-		return isAuth;
+	//user password 정확한지 확인
+	public static UserVO userLogin (String user_id) {
+		UserVO userInfo = new UserVO();
+		try {
+			userLoginPsmt.setString(1, user_id);
+			ResultSet rs = userLoginPsmt.executeQuery();
+			
+			if (rs.next()) {
+				System.out.println("데이터 있다");
+				userInfo = new UserVO(
+				rs.getInt("user_no"),
+				rs.getString("user_id"),
+				rs.getString("user_pass"),
+				rs.getString("user_name"),
+				rs.getString("user_phone"),
+				rs.getString("user_addr"),
+				rs.getString("user_sex"),
+				rs.getString("user_role"),
+				rs.getString("user_delete_YN"),
+				rs.getString("user_login_recent"),
+				rs.getString("user_logout_recent")
+				);
+			} else {
+				System.out.println("데이터 없다");
+				userInfo = null;
+			}
+			rs.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			e.getMessage();
+		}
+		
+		return userInfo;
 	}
 	
 	//로그인시 최근 로그인 update
@@ -253,6 +292,7 @@ public class UserDAO {
 		try {
 			userRecentLoginPsmt.setString(1,user_id);
 			updated = userRecentLoginPsmt.executeUpdate();
+			conn.commit();
 			
 			if (updated == 1) {
 				message = "성공";

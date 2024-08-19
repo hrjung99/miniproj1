@@ -10,7 +10,7 @@ public class PrintScreen {
 	
 	//콘솔 디자인
 	private static String title = "";
-	private static final int  width = 80; // 구분선의 전체 길이
+	private static final int  width = 120; // 구분선의 전체 길이
 	private static int padding = (width - title.length()) / 2;
 //
 //	System.out.println("=".repeat(width));
@@ -74,7 +74,7 @@ public class PrintScreen {
 				break;
 			case "3":
 				System.out.println("아이디 찾기 화면으로 이동합니다.");
-				UserDAO.FindId();
+				UserScreen.findId();
 				isValid = true;
 				break;
 			case "4":
@@ -92,6 +92,7 @@ public class PrintScreen {
 				break;
 			}
 		}
+		isValid = false;
 
 	}
 }

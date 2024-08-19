@@ -17,7 +17,7 @@ public class UserVO {
 	private String user_addr;
 	private String user_sex;
 	private String user_role;
-	private String user_deleteYN;
+	private String user_delete_YN;
 	private String user_login_recent;
 	private String user_logout_recent;
 	
