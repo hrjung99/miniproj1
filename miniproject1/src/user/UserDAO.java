@@ -35,6 +35,14 @@ public class UserDAO {
 	private static PreparedStatement userRecentLoginPsmt = null;
 	private static PreparedStatement userRecentLogoutPsmt = null;
 	
+	//이름, 전화번호로 아이디 찾기
+	private static PreparedStatement userFindIdPsmt = null;
+	
+	//아이디, 이름, 전화번호로 존재하는 계정인지 조회
+	private static PreparedStatement userCheckForResetPassPsmt = null;
+	//아이디, 이름, 전화번호로 비밀번호 변경
+	private static PreparedStatement userResetPassPsmt = null;
+	
 
 	// 연결 및 쿼리
 	static {
@@ -97,6 +105,26 @@ public class UserDAO {
 					UPDATE TB_USER
 					SET user_logout_recent = SYSDATE 
 					WHERE user_id = ?
+					""");
+			
+			
+			//이름과 전화번호로 아이디 찾기
+			userFindIdPsmt = conn.prepareStatement("""
+					SELECT USER_ID FROM TB_USER WHERE USER_NAME = ? AND USER_PHONE= ?
+					""");
+			
+			//아이디, 이름, 전화번호로 해당 계정 존재 여부 확인
+			userCheckForResetPassPsmt = conn.prepareStatement("""
+					WHERE USER_ID = ? AND USER_NAME = ? AND USER_PHONE = ?
+					""");
+			
+			//아이디, 이름, 전화번호로 비밀번호 변경
+			userResetPassPsmt = conn.prepareStatement("""
+					UPDATE TB_USER 
+					SET USER_PASS = ?
+					WHERE USER_ID = ? 
+					AND USER_NAME = ? 
+					AND USER_PHONE = ?
 					""");
 
 
@@ -249,7 +277,7 @@ public class UserDAO {
 		return isAvailable;
 	}
 	
-	//user password 정확한지 확인
+	//로그인
 	public static UserVO userLogin (String user_id) {
 		UserVO userInfo = new UserVO();
 		try {
@@ -330,22 +358,71 @@ public class UserDAO {
 		return message;
 	}
 	
-	
-	
-	
-	
-	//아이디 찾기
-	public static void FindId() {
-			
+	// 아이디 찾기
+	public static String userFindId(String user_name, String user_phone) {
+		String user_id = "";
+
+		try {
+			userFindIdPsmt.setString(1, user_name);
+			userFindIdPsmt.setString(2, user_phone);
+			ResultSet rs = userFindIdPsmt.executeQuery();
+
+			if (rs.next()) {
+				user_id = rs.getString("user_id");
+			} else {
+				user_id = null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			e.getMessage();
 		}
-	
-	
-	
-	
-	
-	
-	//비밀번호 초기화
-	public static void ResetPass() {
+		return user_id;
+	}
+
+	// 비밀번호 초기화
+	//1. 검증
+	public static boolean checkUserForPasswordReset(String user_id, String user_name, String user_phone) {
+		boolean check = false;
+		try {
+			userCheckForResetPassPsmt.setString(1, user_id);
+			userCheckForResetPassPsmt.setString(2, user_name);
+			userCheckForResetPassPsmt.setString(3, user_phone);
 			
+			ResultSet rs = userCheckForResetPassPsmt.executeQuery();
+			if (rs.next()) {
+				check = true;
+			} else {
+				check = false;
+			}
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			e.getMessage();
 		}
+		return check;
+	}
+	//2. reset
+	public static String userResetPass(String user_id, String user_name, String user_phone, String user_pass) {
+		int updated = 0;
+		String message ="";
+		try {
+			userResetPassPsmt.setString(1, user_pass);
+			userResetPassPsmt.setString(2, user_id);
+			userResetPassPsmt.setString(3, user_name);
+			userResetPassPsmt.setString(4, user_phone);
+			updated = userResetPassPsmt.executeUpdate();
+			if (updated == 1) {
+				message = "성공";
+				conn.commit();
+			} else {
+				message = "실패";
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			e.getMessage();
+		}
+		return message;
+	}
 }

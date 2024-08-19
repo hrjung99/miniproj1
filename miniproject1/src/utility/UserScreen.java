@@ -7,63 +7,50 @@ import board.BoardVO;
 import user.UserDAO;
 import user.UserVO;
 
-
-
 public class UserScreen {
-	//콘솔 디자인
+	// 콘솔 디자인
 	private static String title = "";
-	private static final int  width = 120; // 구분선의 전체 길이
+	private static final int width = 120; // 구분선의 전체 길이
 	private static int padding = (width - title.length()) / 2;
 
 	// 스캐너 선언
-    private static Scanner scan_input = new Scanner(System.in);
-    private static String input;
-	
-	//정확한 입력 값을 받기위한 변수
+	private static Scanner scan_input = new Scanner(System.in);
+	private static String input;
+
+	// 정확한 입력 값을 받기위한 변수
 	private static boolean isValid = false;
-	
-	//메세지 변수 선언
-	private static String message="";
-	
-	//회원 정보
+
+	// 메세지 변수 선언
+	private static String message = "";
+
+	// 회원 정보
 	private static UserVO userInfo = new UserVO();
-	
-	
-	//회원 목록 화면
+
+	// 회원 목록 화면
 	public static void printUserListScreen() {
 		PrintScreen.printTitle("[회원 목록]");
 		// 헤더 출력
-        String header = String.format("| %-8s | %-10s | %-10s | %-15s | %-20s | %-4s | %-6s | %-8s | %-19s | %-19s |",
-                                      "회원번호", "아이디", "이름", "전화번호", "주소", "성별", "권한", "탈퇴여부", "최근 로그인", "최근 로그아웃");
-        System.out.println(header);
-        System.out.println("-".repeat(width));
+		String header = String.format("| %-8s | %-10s | %-10s | %-15s | %-20s | %-4s | %-6s | %-8s | %-19s | %-19s |",
+				"회원번호", "아이디", "이름", "전화번호", "주소", "성별", "권한", "탈퇴여부", "최근 로그인", "최근 로그아웃");
+		System.out.println(header);
+		System.out.println("-".repeat(width));
 
-        // 사용자 목록 가져오기
-        List<UserVO> userList = UserDAO.userList(new UserVO());
+		// 사용자 목록 가져오기
+		List<UserVO> userList = UserDAO.userList(new UserVO());
 
-        // 각 사용자 정보 출력
-        for (UserVO user : userList) {
-            String row = String.format("| %-8d | %-10s | %-10s | %-15s | %-20s | %-4s | %-6s | %-8s | %-19s | %-19s |",
-                                       user.getUser_no(),
-                                       user.getUser_id(),
-                                       user.getUser_name(),
-                                       user.getUser_phone(),
-                                       user.getUser_addr(),
-                                       user.getUser_sex(),
-                                       user.getUser_role(),
-                                       user.getUser_deleteYN(),
-                                       user.getUser_login_recent(),
-                                       user.getUser_logout_recent());
-            System.out.println(row);
-        }
+		// 각 사용자 정보 출력
+		for (UserVO user : userList) {
+			String row = String.format("| %-8d | %-10s | %-10s | %-15s | %-20s | %-4s | %-6s | %-8s | %-19s | %-19s |",
+					user.getUser_no(), user.getUser_id(), user.getUser_name(), user.getUser_phone(),
+					user.getUser_addr(), user.getUser_sex(), user.getUser_role(), user.getUser_delete_YN(),
+					user.getUser_login_recent(), user.getUser_logout_recent());
+			System.out.println(row);
+		}
 
-        // 표 끝 부분 출력
-        System.out.println("=".repeat(width));
+		// 표 끝 부분 출력
+		System.out.println("=".repeat(width));
 	}
-	
-	
-	
-	
+
 	// 마이페이지 화면
 	public static void printUserViewScreen(UserVO userVO) {
 		PrintScreen.printTitle("[나의 정보 확인]");
@@ -88,93 +75,93 @@ public class UserScreen {
 		UserVO userVO = new UserVO();
 		PrintScreen.printTitle("[회원 가입]");
 		boolean isIdAvailable;
-		
+
 		// 아이디 중복 체크
-        do {
-            System.out.print("아이디 : ");
-    		input = scan_input.nextLine();
-            userVO.setUser_id(input);
-            
-            isIdAvailable = UserDAO.isIdAvailable(input); // 아이디 중복 체크 함수 호출
-            
-            if (isIdAvailable) {
-            	System.out.println();
-                System.out.println("이미 존재하는 아이디 입니다.\n 다른 아이디를 입력해 주세요.");
-            }
-        } while (isIdAvailable); // 아이디가 유효할 때까지 반복
-		
+		do {
+			System.out.print("아이디 : ");
+			input = scan_input.nextLine();
+			userVO.setUser_id(input);
+
+			isIdAvailable = UserDAO.isIdAvailable(input); // 아이디 중복 체크 함수 호출
+
+			if (isIdAvailable) {
+				System.out.println();
+				System.out.println("이미 존재하는 아이디 입니다.\n 다른 아이디를 입력해 주세요.");
+			}
+		} while (isIdAvailable); // 아이디가 유효할 때까지 반복
+
 		System.out.print("비밀번호 : ");
 		input = scan_input.nextLine();
 		userVO.setUser_pass(input);
-		
+
 		System.out.print("이름 : ");
 		input = scan_input.nextLine();
 		userVO.setUser_name(input);
-		
+
 		System.out.println("전화번호 입력 시 \"-\"를 제외하고 숫자만 입력하십시오.");
 		System.out.print("전화번호 : ");
 		input = scan_input.nextLine();
-	    userVO.setUser_phone(etcMethod.formatPhoneNumber(input));
-		
+		userVO.setUser_phone(etcMethod.formatPhoneNumber(input));
+
 		System.out.println("주소 입력 예시 :  \"서울특별시 강서구 화곡동\"");
 		System.out.print("주소 : ");
 		input = scan_input.nextLine();
 		userVO.setUser_addr(input);
-		
+
 		System.out.println("성별 입력 예시 :  \"남\", \"여\" 중 선택");
 		System.out.print("성별 : ");
 		input = scan_input.nextLine();
 		userVO.setUser_sex(input);
-				
+
 		while (true) {
-	        System.out.println();
-	        System.out.println("1. 가입");
-	        System.out.println("2. 다시 입력");
-	        System.out.println("3. 이전 화면으로");
-	        System.out.println();
+			System.out.println();
+			System.out.println("1. 가입");
+			System.out.println("2. 다시 입력");
+			System.out.println("3. 이전 화면으로");
+			System.out.println();
 			System.out.println("원하는 기능을 선택하십시오.");
 			System.out.print("기능 번호 : ");
 			String choice = scan_input.nextLine();
-	        
-	        switch (choice) {
-	            case "1":
-	                // 1. 가입
-	                String message = UserDAO.userInsert(userVO);
-	                if (message.equals("성공")) {
-	                    System.out.println("가입을 축하합니다.");
-	                    PrintScreen.printMainSecreen();
-	                } else {
-	                    System.out.println("오류: 회원 가입이 실패했습니다.");
-	                }
-	                return; // 메서드 종료
-	                
-	            case "2":
-	                // 2. 다시 입력
-	                printUserInsertScreen(); // 재귀 호출
-	                return; // 메서드 종료
-	                
-	            case "3":
-	                // 3. 이전 화면으로
-	                PrintScreen.printMainSecreen();
-	                return; // 메서드 종료
-	                
-	            default:
-	                System.out.println("잘못된 선택입니다. 다시 선택해 주세요.");
-	                break; // 올바른 선택이 아닐 경우 반복
-	        }
-	    }
+
+			switch (choice) {
+			case "1":
+				// 1. 가입
+				String message = UserDAO.userInsert(userVO);
+				if (message.equals("성공")) {
+					System.out.println("가입을 축하합니다.");
+					PrintScreen.printMainSecreen();
+				} else {
+					System.out.println("오류: 회원 가입이 실패했습니다.");
+				}
+				return; // 메서드 종료
+
+			case "2":
+				// 2. 다시 입력
+				printUserInsertScreen(); // 재귀 호출
+				return; // 메서드 종료
+
+			case "3":
+				// 3. 이전 화면으로
+				PrintScreen.printMainSecreen();
+				return; // 메서드 종료
+
+			default:
+				System.out.println("잘못된 선택입니다. 다시 선택해 주세요.");
+				break; // 올바른 선택이 아닐 경우 반복
+			}
+		}
 	}
-	
-	//회원 탈퇴 화면
+
+	// 회원 탈퇴 화면
 	public static void printUserDeleteScreen() {
-		
+
 	}
-	
-	//회원 수정 화면
+
+	// 회원 수정 화면
 	public static void printUserUpdateScreen() {
-		
+
 	}
-	
+
 	// 로그인
 	public static void printLoginScreen() {
 		PrintScreen.printTitle("[로그인]");
@@ -228,7 +215,7 @@ public class UserScreen {
 					}
 				}
 
-			// 2일 경우 로그인 정보 다시 입력
+				// 2일 경우 로그인 정보 다시 입력
 			case "2":
 				break;
 
@@ -245,9 +232,6 @@ public class UserScreen {
 		}
 	}
 
-	
-	
-	
 	// 로그 아웃
 	public static void printLogoutScreen() {
 
@@ -268,7 +252,7 @@ public class UserScreen {
 		switch (choice) {
 		case "1":
 			// 나의 정보 확인
-			printUserViewScreen(currentUserInfo);
+			currentUserInfo.getUser_no();
 			break;
 
 		case "2":
@@ -294,7 +278,7 @@ public class UserScreen {
 		}
 
 	}
-	
+
 	// 로그인 성공 후 화면 for admin
 	public static void printListAfterLoginForAdmin(UserVO currentUserInfo) {
 		PrintScreen.printTitle("[메뉴 - 관리자]");
@@ -322,11 +306,11 @@ public class UserScreen {
 			// 게시물 목록
 			BoardScreen.printBoardListScreen(currentUserInfo);
 			break;
-			
+
 		case "3":
-            // 회원 목록
-            printUserListScreen();
-            break;
+			// 회원 목록
+			printUserListScreen();
+			break;
 
 		case "4":
 			// 로그아웃
@@ -346,15 +330,102 @@ public class UserScreen {
 		}
 
 	}
+
 	public static void findId() {
 		PrintScreen.printTitle("[아이디 찾기]");
-		System.out.print("이름 : ");
-		String input_name = scan_input.nextLine();
-		
-		System.out.print("전화번호 : ");
-		String input_phone = scan_input.nextLine();
-		
-		
+
+		while (true) {
+			System.out.println("아이디 찾기를 종료하고 싶으시다면, 'q'를 눌러주십시오. 이전 화면으로 돌아갑니다.");
+
+			System.out.print("이름 : ");
+			String input_name = scan_input.nextLine();
+
+			System.out.print("전화번호 : ");
+			String input_phone = scan_input.nextLine();
+			input_phone = etcMethod.formatPhoneNumber(input_phone); // 전화번호 포맷 맞추기
+
+			if ("q".equalsIgnoreCase(input_name) || "q".equalsIgnoreCase(input_phone)) {
+				// 사용자가 'q'를 입력한 경우, 메인 화면으로 이동
+				PrintScreen.printMainSecreen();
+				return; // 메인 화면으로 이동 후 메서드 종료
+			}
+
+			String user_id = UserDAO.userFindId(input_name, input_phone);
+
+			if (user_id != null) {
+				// 아이디 찾기 성공
+				System.out.println("[" + input_name + "]님의 아이디는 [" + user_id + "] 입니다.");
+				PrintScreen.printMainSecreen(); // 아이디 찾기 후 메인 화면으로 이동
+				return; // 메서드 종료
+			} else {
+				// 아이디 찾기 실패
+				System.out.println("회원 정보를 찾을 수 없습니다. 다시 입력해 주십시오.");
+				System.out.println();
+				// while 루프가 반복되어 사용자에게 다시 입력을 받도록 함
+			}
+		}
 	}
 
+	public static void resetPassword() {
+		PrintScreen.printTitle("[비밀번호 초기화]");
+		while (true) {
+			System.out.print("아이디 : ");
+			String input_id = scan_input.nextLine();
+
+			System.out.print("이름 : ");
+			String input_name = scan_input.nextLine();
+
+			System.out.print("전화번호 : ");
+			String input_phone = scan_input.nextLine();
+			input_phone = etcMethod.formatPhoneNumber(input_phone);
+
+			boolean check = UserDAO.checkUserForPasswordReset(input_id, input_name, input_phone);
+			if (check) { // true 일경우 = 해당 아이디 존재한다.
+				System.out.println();
+				System.out.println("[" + input_id + "]님의 비밀번호 초기화");
+				System.out.println("변경할 비밀번호를 입력해주십시오.");
+				System.out.println("비밀번호 초기화를 종료하고 싶으시다면, q를 눌러주십시오. 이전화면으로 돌아갑니다.");
+				System.out.print("새로운 비밀번호 :");
+				String input_pass = scan_input.nextLine();
+				if ("q".equalsIgnoreCase(input_pass)) {
+					// 사용자가 'q'를 입력한 경우, 메인 화면으로 이동
+					PrintScreen.printMainSecreen();
+					return; // 메인 화면으로 이동 후 메서드 종료
+				}
+				// 'q'가 아닌 경우 비밀번호 초기화 시도
+				String message = UserDAO.userResetPass(input_id, input_name, input_phone, input_pass);
+
+				if (message.equals("성공")) {
+					System.out.println();
+					System.out.println("비밀번호가 초기화 되었습니다.");
+					PrintScreen.printMainSecreen();
+				} else {
+					System.out.println("오류 발생");
+				}
+			} else {
+				System.out.println("해당 정보의 회원을 찾을 수 없습니다.");
+				System.out.println("1. 다시 입력");
+				System.out.println("2. 이전 화면으로");
+
+				System.out.println();
+				System.out.println("원하는 기능을 선택하십시오.");
+				System.out.print("기능 번호 : ");
+				input = scan_input.nextLine();
+
+				switch (input) {
+				case "1":
+					// 다시 입력 화면으로 돌아가기
+					break;
+				case "2":
+					PrintScreen.printMainSecreen(); // 메인 화면으로 이동
+					return; // 메인 화면으로 이동 후 종료
+				default:
+					System.out.println("잘못된 입력입니다.");
+					// 기능 선택으로 돌아가기
+					break;
+				}
+			}
+
+		}
+	}
 }

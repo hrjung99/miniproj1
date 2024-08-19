@@ -79,7 +79,7 @@ public class PrintScreen {
 				break;
 			case "4":
 				System.out.println("비밀번호 초기화 화면으로 이동합니다.");
-				UserDAO.ResetPass();
+				UserScreen.resetPassword();
 				isValid = true;
 			case "5":
 				System.out.println("프로그램을 종료합니다. 이용해주셔서 감사합니다.");
