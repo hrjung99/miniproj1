@@ -95,4 +95,98 @@ public class PrintScreen {
 		isValid = false;
 
 	}
+	
+	// 로그인 성공 후 화면
+		public static void printListAfterLogin(UserVO currentUserInfo) {
+			PrintScreen.printTitle("[메뉴]");
+			System.out.println("1. 나의 정보 확인");
+			System.out.println("2. 게시물 목록");
+			System.out.println("3. 로그아웃");
+			System.out.println("4. 프로그램 종료");
+
+			System.out.println();
+			System.out.println("원하는 기능을 선택하십시오.");
+			System.out.print("기능 번호 : ");
+			String choice = scan_input.nextLine();
+			switch (choice) {
+			case "1":
+				// 나의 정보 확인
+				UserScreen.printUserViewScreen(currentUserInfo);
+				break;
+
+			case "2":
+				// 게시물 목록
+				BoardScreen.printBoardListScreen(currentUserInfo);
+				break;
+
+			case "3":
+				// 로그아웃
+				UserScreen.printLogoutScreen(currentUserInfo);
+				break;
+
+			case "4":
+				// 프로그램 종료
+				System.out.println("프로그램을 종료합니다.");
+				System.exit(0); // 프로그램 종료
+
+			default:
+				// 잘못된 선택
+				System.out.println("잘못된 선택입니다. 다시 선택해 주세요.");
+				printListAfterLogin(currentUserInfo); // 잘못된 선택 시 다시 화면 표시
+				break;
+			}
+
+		}
+
+		// 로그인 성공 후 화면 for admin
+		public static void printListAfterLoginForAdmin(UserVO currentUserInfo) {
+			PrintScreen.printTitle("[메뉴 - 관리자]");
+			System.out.println("1. 나의 정보 확인");
+			System.out.println("2. 게시물 목록");
+			System.out.println("3. 회원 목록");
+			System.out.println("4. 로그아웃");
+			System.out.println("5. 프로그램 종료");
+
+			System.out.println();
+			System.out.println("원하는 기능을 선택하십시오.");
+			System.out.print("기능 번호 : ");
+			String choice = scan_input.nextLine();
+			switch (choice) {
+			case "1":
+				// 나의 정보 확인
+				UserScreen.printUserViewScreen(currentUserInfo);
+				break;
+
+			// case 3
+			// 회원 목록
+			// printUserListScreen() 함수 호출
+
+			case "2":
+				// 게시물 목록
+				BoardScreen.printBoardListScreen(currentUserInfo);
+				break;
+
+			case "3":
+				// 회원 목록
+				UserScreen.printUserListScreen();
+				break;
+
+			case "4":
+				// 로그아웃
+				UserScreen.printLogoutScreen(currentUserInfo);
+				break;
+
+			case "5":
+				// 프로그램 종료
+				System.out.println("프로그램을 종료합니다.");
+				System.exit(0); // 프로그램 종료
+
+			default:
+				// 잘못된 선택
+				System.out.println("잘못된 선택입니다. 다시 선택해 주세요.");
+				printListAfterLogin(currentUserInfo); // 잘못된 선택 시 다시 화면 표시
+				break;
+			}
+
+		}
 }

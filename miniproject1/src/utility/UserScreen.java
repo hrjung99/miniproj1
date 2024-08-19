@@ -52,19 +52,23 @@ public class UserScreen {
 	}
 
 	// 마이페이지 화면
-	public static void printUserViewScreen(UserVO userVO) {
+	public static void printUserViewScreen(UserVO currentUserInfo) {
 		PrintScreen.printTitle("[나의 정보 확인]");
-		UserVO currentUserInfo = new UserVO();
-		currentUserInfo = UserDAO.userView(userVO);
 		// 조회된 사용자 정보를 화면에 출력
 		if (currentUserInfo != null) {
 			System.out.println("아이디        : " + currentUserInfo.getUser_id());
-			System.out.println("이름          : " + currentUserInfo.getUser_name());
-			System.out.println("전화번호      : " + currentUserInfo.getUser_phone());
+			System.out.println("이름         : " + currentUserInfo.getUser_name());
+			System.out.println("전화번호       : " + currentUserInfo.getUser_phone());
 			System.out.println("주소          : " + currentUserInfo.getUser_addr());
 			System.out.println("성별          : " + currentUserInfo.getUser_sex());
-			System.out.println("최근 로그인   : " + currentUserInfo.getUser_login_recent());
-			System.out.println("최근 로그아웃 : " + currentUserInfo.getUser_logout_recent());
+			System.out.println("최근 로그인     : " + currentUserInfo.getUser_login_recent());
+			System.out.println("최근 로그아웃   : " + currentUserInfo.getUser_logout_recent());
+			if (currentUserInfo.getUser_role().equalsIgnoreCase("admin")) {
+				PrintScreen.printListAfterLoginForAdmin(currentUserInfo);
+			} else {
+				PrintScreen.printListAfterLogin(currentUserInfo);
+			}
+		
 		} else {
 			System.out.println("오류 : 사용자 정보를 조회할 수 없습니다.");
 		}
@@ -197,9 +201,9 @@ public class UserScreen {
 							UserDAO.userRecentLoginUpdate(user_id);
 							System.out.println("로그인에 성공했습니다.");
 							if (userInfo.getUser_role().equals("admin")) {
-								printListAfterLoginForAdmin(userInfo);
+								PrintScreen.printListAfterLoginForAdmin(userInfo);
 							} else if (userInfo.getUser_role().equals("user")) {
-								printListAfterLogin(userInfo);
+								PrintScreen.printListAfterLogin(userInfo);
 							}
 							return;
 						} else { // 아이디 비번 틀림 : 로그인 실패
@@ -232,105 +236,23 @@ public class UserScreen {
 		}
 	}
 
-	// 로그 아웃
-	public static void printLogoutScreen() {
-
-	}
-
-	// 로그인 성공 후 화면
-	public static void printListAfterLogin(UserVO currentUserInfo) {
-		PrintScreen.printTitle("[메뉴]");
-		System.out.println("1. 나의 정보 확인");
-		System.out.println("2. 게시물 목록");
-		System.out.println("3. 로그아웃");
-		System.out.println("4. 프로그램 종료");
-
-		System.out.println();
-		System.out.println("원하는 기능을 선택하십시오.");
-		System.out.print("기능 번호 : ");
-		String choice = scan_input.nextLine();
-		switch (choice) {
-		case "1":
-			// 나의 정보 확인
-			currentUserInfo.getUser_no();
-			break;
-
-		case "2":
-			// 게시물 목록
-			BoardScreen.printBoardListScreen(currentUserInfo);
-			break;
-
-		case "3":
-			// 로그아웃
-			printLogoutScreen();
-			break;
-
-		case "4":
-			// 프로그램 종료
-			System.out.println("프로그램을 종료합니다.");
+	// 로그아웃
+	public static void printLogoutScreen(UserVO userInfo) {
+		String message = "";
+		message = UserDAO.userRecentLogoutUpdate(userInfo);
+		if (message.equals("성공")) {
+		System.out.println("로그아웃 완료");
+		PrintScreen.printMainSecreen();
+		} else {
+			System.out.println("로그아웃 도중 오류가 발생했습니다.");
 			System.exit(0); // 프로그램 종료
-
-		default:
-			// 잘못된 선택
-			System.out.println("잘못된 선택입니다. 다시 선택해 주세요.");
-			printListAfterLogin(currentUserInfo); // 잘못된 선택 시 다시 화면 표시
-			break;
 		}
+		
 
 	}
 
-	// 로그인 성공 후 화면 for admin
-	public static void printListAfterLoginForAdmin(UserVO currentUserInfo) {
-		PrintScreen.printTitle("[메뉴 - 관리자]");
-		System.out.println("1. 나의 정보 확인");
-		System.out.println("2. 게시물 목록");
-		System.out.println("3. 회원 목록");
-		System.out.println("4. 로그아웃");
-		System.out.println("5. 프로그램 종료");
-
-		System.out.println();
-		System.out.println("원하는 기능을 선택하십시오.");
-		System.out.print("기능 번호 : ");
-		String choice = scan_input.nextLine();
-		switch (choice) {
-		case "1":
-			// 나의 정보 확인
-			printUserViewScreen(currentUserInfo);
-			break;
-
-		// case 3
-		// 회원 목록
-		// printUserListScreen() 함수 호출
-
-		case "2":
-			// 게시물 목록
-			BoardScreen.printBoardListScreen(currentUserInfo);
-			break;
-
-		case "3":
-			// 회원 목록
-			printUserListScreen();
-			break;
-
-		case "4":
-			// 로그아웃
-			printLogoutScreen();
-			break;
-
-		case "5":
-			// 프로그램 종료
-			System.out.println("프로그램을 종료합니다.");
-			System.exit(0); // 프로그램 종료
-
-		default:
-			// 잘못된 선택
-			System.out.println("잘못된 선택입니다. 다시 선택해 주세요.");
-			printListAfterLogin(currentUserInfo); // 잘못된 선택 시 다시 화면 표시
-			break;
-		}
-
-	}
-
+	
+	//아이디 찾기
 	public static void findId() {
 		PrintScreen.printTitle("[아이디 찾기]");
 
@@ -366,6 +288,8 @@ public class UserScreen {
 		}
 	}
 
+	
+	//비밀번호 초기화
 	public static void resetPassword() {
 		PrintScreen.printTitle("[비밀번호 초기화]");
 		while (true) {

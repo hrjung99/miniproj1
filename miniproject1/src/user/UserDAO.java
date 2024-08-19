@@ -104,7 +104,7 @@ public class UserDAO {
 			userRecentLogoutPsmt = conn.prepareStatement("""
 					UPDATE TB_USER
 					SET user_logout_recent = SYSDATE 
-					WHERE user_id = ?
+					WHERE user_no = ?
 					""");
 			
 			
@@ -181,33 +181,33 @@ public class UserDAO {
 //	}
 //
 	// user view
-	public static UserVO userView(UserVO userVO) {
-		UserVO user = null;
-		try {
-			userIdValidPsmt.setInt(1, userVO.getUser_no());
-			
-			ResultSet rs = userIdValidPsmt.executeQuery();
-			if(rs.next()) {
-				user = new UserVO(
-						rs.getInt("user_no")
-						,rs.getString("user_id")
-						,rs.getString("user_pass")
-						,rs.getString("user_name")
-						,rs.getString("user_phone")
-						,rs.getString("user_addr")
-						,rs.getString("user_sex")
-						,rs.getString("user_role")
-						,rs.getString("user_deleteYN")
-						,rs.getString("user_login_recent")
-						,rs.getString("user_logout_recent")
-						);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
-		}
-		return user;
-	}
+//	public static UserVO userView(UserVO userVO) {
+//		UserVO user = null;
+//		try {
+//			userIdValidPsmt.setInt(1, userVO.getUser_no());
+//			
+//			ResultSet rs = userIdValidPsmt.executeQuery();
+//			if(rs.next()) {
+//				user = new UserVO(
+//						rs.getInt("user_no")
+//						,rs.getString("user_id")
+//						,rs.getString("user_pass")
+//						,rs.getString("user_name")
+//						,rs.getString("user_phone")
+//						,rs.getString("user_addr")
+//						,rs.getString("user_sex")
+//						,rs.getString("user_role")
+//						,rs.getString("user_deleteYN")
+//						,rs.getString("user_login_recent")
+//						,rs.getString("user_logout_recent")
+//						);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			e.getMessage();
+//		}
+//		return user;
+//	}
 
 	// user insert
 	public static String userInsert(UserVO userVO) {
@@ -286,7 +286,6 @@ public class UserDAO {
 			ResultSet rs = userLoginPsmt.executeQuery();
 			
 			if (rs.next()) {
-				System.out.println("데이터 있다");
 				userInfo = new UserVO(
 				rs.getInt("user_no"),
 				rs.getString("user_id"),
@@ -301,7 +300,6 @@ public class UserDAO {
 				rs.getString("user_logout_recent")
 				);
 			} else {
-				System.out.println("데이터 없다");
 				userInfo = null;
 			}
 			rs.close();
@@ -338,14 +336,15 @@ public class UserDAO {
 	}
 	
 	//로그인시 최근 로그아웃 update
-	public static String userRecentLogoutUpdate(String user_id) {
+	public static String userRecentLogoutUpdate(UserVO userInfo) {
 		String message = "";
 		int updated = 0;
 		try {
-			userRecentLogoutPsmt.setString(1,user_id);
+			userRecentLogoutPsmt.setInt(1,userInfo.getUser_no());
 			updated = userRecentLogoutPsmt.executeUpdate();
 			
 			if (updated == 1) {
+				conn.commit();
 				message = "성공";
 			} else {
 				message = "실패";
