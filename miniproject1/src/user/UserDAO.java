@@ -115,6 +115,7 @@ public class UserDAO {
 			
 			//아이디, 이름, 전화번호로 해당 계정 존재 여부 확인
 			userCheckForResetPassPsmt = conn.prepareStatement("""
+					SELECT * FROM TB_USER
 					WHERE USER_ID = ? AND USER_NAME = ? AND USER_PHONE = ?
 					""");
 			

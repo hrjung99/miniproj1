@@ -252,6 +252,8 @@ UPDATE TB_USER
 SET user_login_recent = SYSDATE
 WHERE user_id = 'testuser';
 
+-- 이름과 전화번호로 아이디 찾기
+SELECT USER_ID FROM TB_USER WHERE USER_NAME ='정혜림' AND USER_PHONE='010-6349-8285';
 
 -- 최근 로그아웃 update
 UPDATE TB_USER
@@ -259,3 +261,12 @@ SET user_logout_recent = SYSDATE
 WHERE user_id = 'testuser';
 
 SELECT * FROM TB_USER;
+
+-- 아이디, 이름, 전화번호로 비밀 번호 변경
+UPDATE TB_USER 
+SET USER_PASS = '1234'
+WHERE USER_ID = 'hyerim' AND USER_NAME = '정혜림' AND USER_PHONE = '010-6349-8285';
+
+SELECT * FROM TB_USER 
+WHERE USER_ID = 'hyerim' AND USER_NAME = '정혜림' AND USER_PHONE = '010-6349-8285';
+

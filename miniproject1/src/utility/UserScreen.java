@@ -383,6 +383,7 @@ public class UserScreen {
 			if (check) { // true 일경우 = 해당 아이디 존재한다.
 				System.out.println();
 				System.out.println("[" + input_id + "]님의 비밀번호 초기화");
+				System.out.println();
 				System.out.println("변경할 비밀번호를 입력해주십시오.");
 				System.out.println("비밀번호 초기화를 종료하고 싶으시다면, q를 눌러주십시오. 이전화면으로 돌아갑니다.");
 				System.out.print("새로운 비밀번호 :");
