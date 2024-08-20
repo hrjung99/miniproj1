@@ -15,6 +15,7 @@ public class BoardVO {
 	private String board_content;
 	private int board_view_cnt;
 	private String board_reg_date;
+	private String board_pass;
 	private int user_no;
 
 	//board list 생성자

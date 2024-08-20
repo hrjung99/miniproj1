@@ -3,6 +3,8 @@ package utility;
 import java.util.List;
 import java.util.Scanner;
 
+import Loginhistory.LoginHistoryDAO;
+import Loginhistory.LoginHistoryVO;
 import board.BoardVO;
 import user.UserDAO;
 import user.UserVO;
@@ -10,7 +12,7 @@ import user.UserVO;
 public class UserScreen {
 	// 콘솔 디자인
 	private static String title = "";
-	private static final int width = 120; // 구분선의 전체 길이
+	private static final int width = 250; // 구분선의 전체 길이
 	private static int padding = (width - title.length()) / 2;
 
 	// 스캐너 선언
@@ -27,11 +29,29 @@ public class UserScreen {
 	private static UserVO userInfo = new UserVO();
 
 	// 회원 목록 화면
-	public static void printUserListScreen() {
+	public static void printUserListScreen(UserVO currentUserInfo) {
 		PrintScreen.printTitle("[회원 목록]");
+
+		// 전체 테이블의 너비와 열의 너비를 정의합니다.
+		int width = 250;
+		int noWidth = 5;
+		int idWidth = 15;
+		int nameWidth = 20;
+		int phoneWidth = 30;
+		int addrWidth = 40;
+		int sexWidth = 10;
+		int roleWidth = 13;
+		int deleteYNWidth = 16;
+		int loginWidth = 30;
+		int logoutWidth = 30;
+
 		// 헤더 출력
-		String header = String.format("| %-8s | %-10s | %-10s | %-15s | %-20s | %-4s | %-6s | %-8s | %-19s | %-19s |",
+		String header = String.format(
+				"| %-" + noWidth + "s | %-" + idWidth + "s | %-" + nameWidth + "s | %-" + phoneWidth + "s | %-"
+						+ addrWidth + "s | %-" + sexWidth + "s | %-" + roleWidth + "s | %-" + deleteYNWidth + "s | %-"
+						+ loginWidth + "s | %-" + logoutWidth + "s |",
 				"회원번호", "아이디", "이름", "전화번호", "주소", "성별", "권한", "탈퇴여부", "최근 로그인", "최근 로그아웃");
+		System.out.println("-".repeat(width));
 		System.out.println(header);
 		System.out.println("-".repeat(width));
 
@@ -40,18 +60,144 @@ public class UserScreen {
 
 		// 각 사용자 정보 출력
 		for (UserVO user : userList) {
-			String row = String.format("| %-8d | %-10s | %-10s | %-15s | %-20s | %-4s | %-6s | %-8s | %-19s | %-19s |",
-					user.getUser_no(), user.getUser_id(), user.getUser_name(), user.getUser_phone(),
-					user.getUser_addr(), user.getUser_sex(), user.getUser_role(), user.getUser_delete_YN(),
-					user.getUser_login_recent(), user.getUser_logout_recent());
+			String row = String.format(
+					"| %-" + noWidth + "s | %-" + idWidth + "s | %-" + nameWidth + "s | %-" + phoneWidth + "s | %-"
+							+ addrWidth + "s | %-" + sexWidth + "s | %-" + roleWidth + "s | %-" + deleteYNWidth
+							+ "s | %-" + loginWidth + "s | %-" + logoutWidth + "s |",
+					etcMethod.truncateOrPad(String.valueOf(user.getUser_no()), noWidth),
+					etcMethod.truncateOrPad(user.getUser_id(), idWidth),
+					etcMethod.truncateOrPad(user.getUser_name(), nameWidth),
+					etcMethod.truncateOrPad(user.getUser_phone(), phoneWidth),
+					etcMethod.truncateOrPad(user.getUser_addr(), addrWidth),
+					etcMethod.truncateOrPad(user.getUser_sex(), sexWidth),
+					etcMethod.truncateOrPad(user.getUser_role(), roleWidth),
+					etcMethod.truncateOrPad(user.getUser_delete_YN(), deleteYNWidth),
+					etcMethod.truncateOrPad(
+							user.getUser_login_recent() != null ? user.getUser_login_recent().toString() : "null",
+							loginWidth),
+					etcMethod.truncateOrPad(
+							user.getUser_logout_recent() != null ? user.getUser_logout_recent().toString() : "null",
+							logoutWidth));
 			System.out.println(row);
+			;
 		}
 
 		// 표 끝 부분 출력
 		System.out.println("=".repeat(width));
+
+		while (true) {
+			System.out.println();
+			System.out.println("상세하게 보고싶은 회원의 번호를 입력하십시오.");
+			System.out.println("\'q\'를 입력하면 이전 화면으로 이동합니다.");
+			System.out.print("회원 번호 : ");
+			String user_no = scan_input.nextLine();
+
+			if (user_no.equalsIgnoreCase("q")) {
+				System.out.println("이전 화면으로 이동합니다.");
+				PrintScreen.printListAfterLoginForAdmin(currentUserInfo);
+				break;
+			} else {
+				UserVO userInfo = UserDAO.userView(user_no);
+				if (userInfo != null) {
+					PrintScreen.printTitle("[" + userInfo.getUser_id() + "의 회원 정보] ");
+					System.out.println("");
+					System.out.println("회원 번호 : " + userInfo.getUser_no());
+					System.out.println("아이디 : " + userInfo.getUser_id());
+					System.out.println("이름 : " + userInfo.getUser_name());
+					System.out.println("전화번호  : " + userInfo.getUser_phone());
+					System.out.println("주소 : " + userInfo.getUser_addr());
+					System.out.println("성별 : " + userInfo.getUser_sex());
+					System.out.println("권한 : " + userInfo.getUser_role());
+					System.out.println("탈퇴 여부 : " + userInfo.getUser_delete_YN());
+					System.out.println("최근 로그인 : " + userInfo.getUser_login_recent());
+					System.out.println("최근 로그아웃  : " + userInfo.getUser_logout_recent());
+
+					boolean validInput = false;
+
+					while (!validInput) { // 사용자가 올바른 선택을 할 때까지 반복
+						System.out.println();
+						System.out.println("1. [" + userInfo.getUser_id() + "] 님의 로그인 이력 조회");
+						System.out.println("2. [" + userInfo.getUser_id() + "] 님의 회원 탈퇴");
+						System.out.println("3. 다른 회원 조회");
+						System.out.println();
+						System.out.print("원하는 기능을 선택해 주세요 : ");
+						String choice = scan_input.nextLine();
+
+						switch (choice) {
+						case "1":
+							// 로그인 이력 조회 로직 호출
+							PrintScreen.printTitle("[" + userInfo.getUser_id() + "님의 로그인 이력 조회]");
+
+							// 해당 사용자의 로그인 이력 가져오기
+							List<LoginHistoryVO> loginHis = LoginHistoryDAO.hisView(userInfo.getUser_no());
+
+							// 전체 테이블의 너비와 열의 너비를 정의합니다.
+							int login_width = 250;
+							int his_noWidth = 5;
+							int login_idWidth = 15;
+							int login_nameWidth = 20;
+							int login_hisWidth = 30;
+							int logout_hisWidth = 40;
+
+							// 헤더 출력
+							header = String.format(
+									"| %-" + his_noWidth + "s | %-" + login_idWidth + "s | %-" + login_nameWidth
+											+ "s | %-" + login_hisWidth + "s | %-" + logout_hisWidth + "s |",
+									"이력 번호", "아이디", "이름", "로그인 이력", "로그아웃 이력");
+							System.out.println("-".repeat(width));
+							System.out.println(header);
+							System.out.println("-".repeat(width));
+
+							// 각 사용자 정보 출력
+							for (LoginHistoryVO his : loginHis) {
+								String row = String.format(
+										"| %-" + his_noWidth + "s | %-" + login_idWidth + "s | %-" + login_nameWidth
+												+ "s | %-" + login_hisWidth + "s | %-" + logout_hisWidth + "s |",
+										etcMethod.truncateOrPad(String.valueOf(his.getHis_no()), his_noWidth),
+										etcMethod.truncateOrPad(his.getUser_id(), login_idWidth),
+										etcMethod.truncateOrPad(his.getUser_name(), login_nameWidth),
+										etcMethod.truncateOrPad(
+												his.getHis_login_date() != null ? his.getHis_login_date().toString()
+														: "null",
+												login_hisWidth),
+										etcMethod.truncateOrPad(
+												his.getHis_logout_date() != null ? his.getHis_logout_date().toString()
+														: "null",
+												logout_hisWidth));
+								System.out.println(row);
+								;
+							}
+							// 표 끝 부분 출력
+							System.out.println("=".repeat(width));
+							validInput = true;
+							break;
+						case "2":
+							// 회원 삭제 로직 호출
+							message = printUserDeleteScreen(userInfo.getUser_no());
+							if (message.equals("성공")) {
+								System.out.println("성공");
+								validInput = true;
+							} else {
+								System.out.println("실패");
+							}
+
+						case "3":
+							System.out.println("회원 선택으로 돌아갑니다.");
+							validInput = true;
+							break;
+						default:
+							System.out.println("잘못된 입력입니다. 다시 시도해 주세요.");
+							break;
+						}
+					}
+				} else {
+					System.out.println("오류 : 사용자 정보를 조회할 수 없습니다.");
+				}
+			}
+		}
 	}
 
-	// 마이페이지 화면
+// 마이페이지 화면
 	public static void printUserViewScreen(UserVO currentUserInfo) {
 		PrintScreen.printTitle("[나의 정보 확인]");
 		// 조회된 사용자 정보를 화면에 출력
@@ -68,7 +214,7 @@ public class UserScreen {
 			} else {
 				PrintScreen.printListAfterLogin(currentUserInfo);
 			}
-		
+
 		} else {
 			System.out.println("오류 : 사용자 정보를 조회할 수 없습니다.");
 		}
@@ -157,12 +303,53 @@ public class UserScreen {
 	}
 
 	// 회원 탈퇴 화면
-	public static void printUserDeleteScreen() {
-
+	public static String printUserDeleteScreen(int user_no) {
+		String message = UserDAO.userDelete(userInfo.getUser_no());
+		return message;
 	}
 
 	// 회원 수정 화면
-	public static void printUserUpdateScreen() {
+	public static void printUserUpdateScreen(UserVO user) {
+		UserVO newUserInfo = new UserVO();
+		PrintScreen.printTitle("[" + user.getUser_name() + " 님의 회원 정보 수정]");
+
+		while (true) {
+			System.out.println();
+			System.out.println("비밀번호를 입력해 주세요.");
+			System.out.println("비밀번호 : ");
+			input = scan_input.nextLine();
+
+			if (input.equals(user.getUser_pass())) {
+				System.out.println("비밀번호 일치");
+				System.out.println();
+				System.out.print("아이디 : " + user.getUser_id());
+				newUserInfo.setUser_id(user.getUser_id());
+
+				System.out.print("비밀번호 : ");
+				input = scan_input.nextLine();
+				newUserInfo.setUser_pass(input);
+
+				System.out.print("이름 : " + user.getUser_name());
+				newUserInfo.setUser_name(user.getUser_name());
+
+				System.out.println("전화번호 입력 시 \"-\"를 제외하고 숫자만 입력하십시오.");
+				System.out.print("전화번호 : ");
+				input = scan_input.nextLine();
+				newUserInfo.setUser_phone(etcMethod.formatPhoneNumber(input));
+
+				System.out.println("주소 입력 예시 :  \"서울특별시 강서구 화곡동\"");
+				System.out.print("주소 : ");
+				input = scan_input.nextLine();
+				newUserInfo.setUser_addr(input);
+
+				System.out.println("성별 입력 예시 :  \"남\", \"여\" 중 선택");
+				System.out.print("성별 : " + user.getUser_sex());
+				newUserInfo.setUser_sex(newUserInfo.getUser_sex());
+				break;
+			} else {
+				System.out.println("비밀번호가 일치하지 않습니다.");
+			}
+		}
 
 	}
 
@@ -241,18 +428,16 @@ public class UserScreen {
 		String message = "";
 		message = UserDAO.userRecentLogoutUpdate(userInfo);
 		if (message.equals("성공")) {
-		System.out.println("로그아웃 완료");
-		PrintScreen.printMainSecreen();
+			System.out.println("로그아웃 완료");
+			PrintScreen.printMainSecreen();
 		} else {
 			System.out.println("로그아웃 도중 오류가 발생했습니다.");
 			System.exit(0); // 프로그램 종료
 		}
-		
 
 	}
 
-	
-	//아이디 찾기
+	// 아이디 찾기
 	public static void findId() {
 		PrintScreen.printTitle("[아이디 찾기]");
 
@@ -288,8 +473,7 @@ public class UserScreen {
 		}
 	}
 
-	
-	//비밀번호 초기화
+	// 비밀번호 초기화
 	public static void resetPassword() {
 		PrintScreen.printTitle("[비밀번호 초기화]");
 		while (true) {

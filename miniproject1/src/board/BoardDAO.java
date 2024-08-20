@@ -61,31 +61,30 @@ public class BoardDAO {
 			// board view
 			boardViewPsmt = conn.prepareStatement("""
 					SELECT B.BOARD_NO,
-					U.USER_NO,
+					B.USER_NO,
 					U.USER_NAME AS BOARD_WRITER,
-					B.BOARD_TITLE,
-					B.BOARD_VIEW_CNT,
-					B.BOARD_REG_DATE
+					B.BOARD_TITLE, B.BOARD_CONTENT,
+					B.BOARD_VIEW_CNT, B.BOARD_REG_DATE
 					FROM TB_BOARD B
 					JOIN TB_USER U ON B.USER_NO = U.USER_NO
 					WHERE B.BOARD_NO = ?
 					ORDER BY B.BOARD_NO ASC
-					""");
+										""");
 			boardViewCntIncPsmt = conn.prepareStatement("""
 					UPDATE TB_BOARD SET BOARD_VIEW_CNT = BOARD_VIEW_CNT+1
 					WHERE BOARD_NO = ?
 					""");
 			// board insert
 			boardInsertPsmt = conn.prepareStatement("""
-					INSERT INTO TB_BOARD 
-					(user_no, board_title, board_content) 
-					VALUES 
-					(?, ?, ?)
+					INSERT INTO TB_BOARD
+					(user_no, board_title, board_content, board_pass)
+					VALUES
+					(?, ?, ?, ?)
 					""");
 			// board update
 			boardUpdatePsmt = conn.prepareStatement("""
-					UPDATE TB_BOARD SET 
-					BOARD_TITLE = ?, 
+					UPDATE TB_BOARD SET
+					BOARD_TITLE = ?,
 					BOARD_CONTENT = ?
 					WHERE BOARD_NO = ?
 					""");
@@ -95,161 +94,137 @@ public class BoardDAO {
 			e.getMessage();
 		}
 	}
-	
-	//board list
-	public static List<BoardVO> boardList(BoardVO boardVO){
-		List boardList = new ArrayList<BoardVO>();
-		
+
+	// board list
+	public static List<BoardVO> boardList() {
+		List<BoardVO> boardList = new ArrayList<BoardVO>();
+
 		try {
 			ResultSet rs = boardListPsmt.executeQuery();
-			while(rs.next()) { // 행이 여러개니까 다음행 있으면 리스트에 담고 없으면 끝내는 코드
-				BoardVO board = new BoardVO(
-						rs.getInt("board_no"),
-						rs.getString("board_writer"),
-						rs.getString("board_title"),
-						rs.getInt("board_view_cnt"),
-						rs.getString("board_reg_date"));
+			while (rs.next()) { // 행이 여러개니까 다음행 있으면 리스트에 담고 없으면 끝내는 코드
+				BoardVO board = new BoardVO(rs.getInt("board_no"), rs.getString("board_writer"),
+						rs.getString("board_title"), rs.getInt("board_view_cnt"), rs.getString("board_reg_date"));
 				boardList.add(board);
-			}	
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
 		}
-		
-		
+
 		return boardList;
 	}
-	
-	//board delete
+
+	// board delete
 	public static String boardDelete(BoardVO boardVO) {
 		int updated = 0;
-		//오류&성공 메세지 리턴을 위한 변수
-		String message ="";
-		
+		// 오류&성공 메세지 리턴을 위한 변수
+		String message = "";
+
 		try {
 			boardDeletePsmt.setInt(1, boardVO.getBoard_no());
 			updated = boardDeletePsmt.executeUpdate();
-			
+
 			if (updated == 1) {
-				message = "게시물 삭제 성공";
+				message = "성공";
 				conn.commit();
-			} else if (updated == 0) {
-				message = "오류 : 게시물 삭제 실패";
-			} else if (updated > 1) {
-				message = "오류 : 하나 이상의 게시물이 삭제 됐습니다.";
 			} else {
-				message = "오류가 발생 했습니다.";
+				message = "실패";
 			}
-			
-		} catch(Exception e){
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
 		}
-		
+
 		return message;
 	}
-	
-	
-	//board view
-	public static BoardVO boardView(BoardVO boardVO) {
+
+	// board view
+	public static BoardVO boardView(String board_no) {
 		BoardVO board = null;
 		int updated = 0;
-		int board_no = board.getBoard_no();
 		String message = "";
-		try { 
-			
-			boardViewCntIncPsmt.setInt(1,board_no);
-			boardViewPsmt.setInt(1, board_no);
+		try {
+
+			boardViewCntIncPsmt.setString(1, board_no);
+			boardViewPsmt.setString(1, board_no);
 			updated = boardViewCntIncPsmt.executeUpdate();
-			
-			if(updated == 1) {
+
+			if (updated == 1) {
 				conn.commit();
-				message = "조회수 증가 성공";
-				
-				
+				message = "성공";
+
 				ResultSet rs = boardViewPsmt.executeQuery();
-				
-				if(rs.next()) {
-					board = new BoardVO(
-							rs.getInt("board_no"),
-							rs.getString("board_writer"),
-							rs.getString("board_title"),
-							rs.getString("board_content"),
-							rs.getInt("board_view_cnt"),
+
+				if (rs.next()) {
+					board = new BoardVO(rs.getInt("board_no"), rs.getString("board_writer"),
+							rs.getString("board_title"), rs.getString("board_content"), rs.getInt("board_view_cnt"),
 							rs.getString("board_reg_date"));
 				}
-				
+
 			} else {
-				message = "오류 : 조회수 증가 실패";
-				System.out.println(message);
+				message = "실패";
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
 		}
 		return board;
 	}
-	
-	
-	
-	//board insert
-	public static String boardInsert (BoardVO boardVO) {
-		UserVO userVO = new UserVO();
+
+	// board insert
+	public static String boardInsert(UserVO userVO, BoardVO boardVO) {
 		String message = "";
 		int updated = 0;
 
 		try {
-			boardInsertPsmt.setInt(1,userVO.getUser_no());
+			boardInsertPsmt.setInt(1, userVO.getUser_no());
 			boardInsertPsmt.setString(2, boardVO.getBoard_title());
 			boardInsertPsmt.setString(3, boardVO.getBoard_content());
-			
+			boardInsertPsmt.setString(4, boardVO.getBoard_pass());
+
 			updated = boardInsertPsmt.executeUpdate();
-			
+
 			if (updated == 1) {
-				message = "게시물 등록 성공";
+				message = "성공";
 				conn.commit();
 			} else {
-				message = "오류 : 게시물 등록 실패";
+				message = "실패";
 			}
-			
-			
-			
-		} catch(Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
 		}
-		
-		
-		
+
 		return message;
 	}
-	
-	//board update
-	public static String  boardUpdate(BoardVO boardVO) {
+
+	// board update
+	public static String boardUpdate(BoardVO boardVO) {
 		String message = "";
 		int updated = 0;
-		
+
 		try {
 			boardUpdatePsmt.setString(1, boardVO.getBoard_title());
 			boardUpdatePsmt.setString(2, boardVO.getBoard_content());
 			boardUpdatePsmt.setInt(3, boardVO.getBoard_no());
 			updated = boardUpdatePsmt.executeUpdate();
-			
-			if(updated == 1) {
-				message = "게시물 수정 성공";
+
+			if (updated == 1) {
+				message = "성공";
 				conn.commit();
 			} else {
-				message = "게시물 수정 실패";
+				message = "실패";
 			}
-			
-			
-		}catch(Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
 		}
-		
+
 		return message;
-		
+
 	}
 
 }

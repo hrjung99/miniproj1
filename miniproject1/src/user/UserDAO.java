@@ -64,13 +64,17 @@ public class UserDAO {
 					SELECT * FROM TB_USER
 					""");
 			// user delete
-//			userDeletePsmt = conn.prepareStatement("");
+			userDeletePsmt = conn.prepareStatement("""
+					UPDATE TB_USER SET USER_DELETE_YN = 'Y' WHERE USER_NO = ?
+					""");
 			
 			
 			// user view
 			userViewPsmt = conn.prepareStatement("""
 					SELECT * FROM TB_USER WHERE USER_NO = ?
 					""");
+			
+			
 			// user insert
 			userInsertPsmt = conn.prepareStatement("""
 					INSERT INTO TB_USER 
@@ -87,6 +91,7 @@ public class UserDAO {
 			
 			userLoginPsmt = conn.prepareStatement("""
 					SELECT * FROM TB_USER WHERE USER_ID = ?
+					AND USER_DELETE_YN='N'
 					""");
 			
 			
@@ -111,12 +116,14 @@ public class UserDAO {
 			//이름과 전화번호로 아이디 찾기
 			userFindIdPsmt = conn.prepareStatement("""
 					SELECT USER_ID FROM TB_USER WHERE USER_NAME = ? AND USER_PHONE= ?
+					AND USER_DELETE_YN='N'
 					""");
 			
 			//아이디, 이름, 전화번호로 해당 계정 존재 여부 확인
 			userCheckForResetPassPsmt = conn.prepareStatement("""
 					SELECT * FROM TB_USER
 					WHERE USER_ID = ? AND USER_NAME = ? AND USER_PHONE = ?
+					AND USER_DELETE_YN='N'
 					""");
 			
 			//아이디, 이름, 전화번호로 비밀번호 변경
@@ -151,7 +158,7 @@ public class UserDAO {
 						,rs.getString("user_addr")
 						,rs.getString("user_sex")
 						,rs.getString("user_role")
-						,rs.getString("user_deleteYN")
+						,rs.getString("user_delete_YN")
 						,rs.getString("user_login_recent")
 						,rs.getString("user_logout_recent"));
 				userList.add(user);
@@ -163,51 +170,58 @@ public class UserDAO {
 		return userList;
 	}
 
-//
-//	// user delete
-//	public static String userDelete(UserVO userVO) {
-//		int updated = 0;
-//		// 오류&성공 메세지 리턴을 위한 변수
-//		String message = "";
-//
-//		try {
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			e.getMessage();
-//		}
-//
-//		return message;
-//	}
-//
+
+	// user delete
+	public static String userDelete(int user_no) {
+		int updated = 0;
+		// 오류&성공 메세지 리턴을 위한 변수
+		String message = "";
+
+		try {
+			userDeletePsmt.setInt(1, user_no);
+			updated = userDeletePsmt.executeUpdate();
+			if ( updated == 1) {
+				message = "성공";
+				conn.commit();
+			} else {
+				message = "실패";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			e.getMessage();
+		}
+
+		return message;
+	}
+
 	// user view
-//	public static UserVO userView(UserVO userVO) {
-//		UserVO user = null;
-//		try {
-//			userIdValidPsmt.setInt(1, userVO.getUser_no());
-//			
-//			ResultSet rs = userIdValidPsmt.executeQuery();
-//			if(rs.next()) {
-//				user = new UserVO(
-//						rs.getInt("user_no")
-//						,rs.getString("user_id")
-//						,rs.getString("user_pass")
-//						,rs.getString("user_name")
-//						,rs.getString("user_phone")
-//						,rs.getString("user_addr")
-//						,rs.getString("user_sex")
-//						,rs.getString("user_role")
-//						,rs.getString("user_deleteYN")
-//						,rs.getString("user_login_recent")
-//						,rs.getString("user_logout_recent")
-//						);
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			e.getMessage();
-//		}
-//		return user;
-//	}
+	public static UserVO userView(String user_no) {
+		UserVO user = null;
+		try {
+			userViewPsmt.setString(1, user_no);
+			ResultSet rs = userViewPsmt.executeQuery();
+			if(rs.next()) {
+				user = new UserVO(
+						rs.getInt("user_no")
+						,rs.getString("user_id")
+						,rs.getString("user_pass")
+						,rs.getString("user_name")
+						,rs.getString("user_phone")
+						,rs.getString("user_addr")
+						,rs.getString("user_sex")
+						,rs.getString("user_role")
+						,rs.getString("user_delete_YN")
+						,rs.getString("user_login_recent")
+						,rs.getString("user_logout_recent")
+						);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			e.getMessage();
+		}
+		return user;
+	}
 
 	// user insert
 	public static String userInsert(UserVO userVO) {
@@ -319,9 +333,9 @@ public class UserDAO {
 		try {
 			userRecentLoginPsmt.setString(1,user_id);
 			updated = userRecentLoginPsmt.executeUpdate();
-			conn.commit();
 			
 			if (updated == 1) {
+				conn.commit();
 				message = "성공";
 			} else {
 				message = "실패";
