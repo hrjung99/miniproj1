@@ -27,13 +27,15 @@ public class BoardVO {
         this.board_reg_date = board_reg_date;
     }
 	
-	public BoardVO(int board_no, String board_writer, String board_title, String board_content, int board_view_cnt, String board_reg_date) {
+	public BoardVO(int board_no, int user_no, String board_writer, String board_title, String board_content, int board_view_cnt, String board_reg_date, String board_pass) {
         this.board_no = board_no;
+        this.user_no = user_no;
         this.board_writer = board_writer;
         this.board_title = board_title;
         this.board_content = board_content;
         this.board_view_cnt = board_view_cnt;
         this.board_reg_date = board_reg_date;
+        this.board_pass = board_pass;
     }
 	
 

@@ -83,6 +83,7 @@ public class BoardScreen {
 		    } else if (board_no.equalsIgnoreCase("i")) {
 		        // 게시물 등록 화면으로 이동
 		        System.out.println("게시물 등록 화면으로 이동합니다.");
+				System.out.println("=".repeat(width));
 		        String message = BoardScreen.printBoardInsertScreen(currentUserInfo);
 		        if (message.equals("성공")) {
 		        	System.out.println("게시물 등록에 성공했습니다.");
@@ -97,7 +98,7 @@ public class BoardScreen {
 		        // 게시물 상세 조회
 		        BoardVO boardView = printBoardViewScreen(board_no);
 		        if (boardView != null) {
-		            PrintScreen.isMyBoard(currentUserInfo, boardView);
+		        	PrintScreen.isMyBoard(currentUserInfo, boardView);
 		        } else {
 		            System.out.println("게시물을 조회할 수 없습니다.");
 		        }
@@ -169,13 +170,6 @@ public class BoardScreen {
         System.out.println("기존 내용: " + boardInfo.getBoard_content());
         System.out.println();
 
-        // 수정할 정보 입력 받기
-        System.out.print("새로운 작성자 (변경하지 않으려면 Enter): ");
-        String newWriter = scan_input.nextLine();
-        if (newWriter.isEmpty()) {
-            newWriter = boardInfo.getBoard_writer();
-        }
-
         System.out.print("새로운 제목 (변경하지 않으려면 Enter): ");
         String newTitle = scan_input.nextLine();
         if (newTitle.isEmpty()) {
@@ -191,7 +185,6 @@ public class BoardScreen {
         // 수정된 정보를 담을 새로운 BoardVO 객체 생성
         BoardVO updatedBoard = new BoardVO();
         updatedBoard.setBoard_no(boardInfo.getBoard_no());
-        updatedBoard.setBoard_writer(newWriter);
         updatedBoard.setBoard_title(newTitle);
         updatedBoard.setBoard_content(newContent);
         

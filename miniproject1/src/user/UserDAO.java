@@ -61,11 +61,11 @@ public class UserDAO {
 			
 			// 페이징 아직
 			userListPsmt = conn.prepareStatement("""
-					SELECT * FROM TB_USER
+					SELECT * FROM TB_USER WHERE USER_DELETE_YN ='N'
 					""");
 			// user delete
 			userDeletePsmt = conn.prepareStatement("""
-					UPDATE TB_USER SET USER_DELETE_YN = 'Y' WHERE USER_NO = ?
+					UPDATE TB_USER SET USER_DELETE_YN ='Y' WHERE USER_NO = ?
 					""");
 			
 			
@@ -85,9 +85,14 @@ public class UserDAO {
 			
 			
 			// user update
-//			userUpdatePsmt = conn.prepareStatement("""
-//
-//					""");
+			userUpdatePsmt = conn.prepareStatement("""
+					UPDATE TB_USER SET 
+					user_pass = ?, 
+					user_name = ?, 
+					user_phone = ?, 
+					user_addr = ?
+					WHERE user_no = ?
+					""");
 			
 			userLoginPsmt = conn.prepareStatement("""
 					SELECT * FROM TB_USER WHERE USER_ID = ?
@@ -98,6 +103,7 @@ public class UserDAO {
 			//아이디 존재하는지 체크
 			userIdValidPsmt = conn.prepareStatement("""
 					SELECT * FROM TB_USER WHERE TB_USER.USER_ID = ?
+					AND USER_DELETE_YN='N'
 					""");
 			
 			//최근 로그인/로그아웃 업데이트
@@ -133,6 +139,7 @@ public class UserDAO {
 					WHERE USER_ID = ? 
 					AND USER_NAME = ? 
 					AND USER_PHONE = ?
+					WHERE USER_DELETE_YN='N'
 					""");
 
 
@@ -178,8 +185,11 @@ public class UserDAO {
 		String message = "";
 
 		try {
+			System.out.println(user_no);
+			System.out.println();
 			userDeletePsmt.setInt(1, user_no);
 			updated = userDeletePsmt.executeUpdate();
+			System.out.println("updated = " + updated);
 			if ( updated == 1) {
 				message = "성공";
 				conn.commit();
@@ -255,21 +265,35 @@ public class UserDAO {
 		return message;
 	}
 
-//	// user update
-//	public static String userUpdate(UserVO userVO) {
-//		String message = "";
-//		int updated = 0;
-//
-//		try {
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			e.getMessage();
-//		}
-//
-//		return message;
-//
-//	}
+	// user update
+	public static void userUpdate(UserVO userVO) {
+		String message = "";
+		int updated = 0;
+
+		try {
+	        // PreparedStatement에 값 설정
+	        userUpdatePsmt.setString(1, userVO.getUser_pass());
+	        userUpdatePsmt.setString(2, userVO.getUser_name());
+	        userUpdatePsmt.setString(3, userVO.getUser_phone());
+	        userUpdatePsmt.setString(4, userVO.getUser_addr());
+	        userUpdatePsmt.setInt(5, userVO.getUser_no());
+
+	        // 쿼리 실행
+	        updated = userUpdatePsmt.executeUpdate();
+
+	        // 업데이트 결과 확인
+	        if (updated == 1) {
+	            message = "성공";
+	            conn.commit();
+	        } else {
+	            message = "실패";
+	        }
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			e.getMessage();
+		}
+	}
 	
 	//user id 존재하는지 확인
 	public static boolean isIdAvailable(String user_id) {

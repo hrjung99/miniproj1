@@ -108,8 +108,78 @@ public class PrintScreen {
 		case "1":
 			// 나의 정보 확인
 			UserScreen.printUserViewScreen(currentUserInfo);
-			break;
-
+			System.out.println("=".repeat(WIDTH));
+			while (true) {
+                System.out.println("1. 회원 정보수정");
+                System.out.println("2. 회원 탈퇴");
+                System.out.println("3. 이전화면으로");
+                System.out.println();
+                System.out.print("기능 번호 : ");
+                String menu = scan_input.nextLine();
+                switch (menu) {
+                    case "1":
+                        while (true) {
+                            // 유저 비밀번호 확인
+                            System.out.println("비밀번호를 입력해주세요.");
+                            System.out.println("이전화면으로 돌아가고 싶다면 \'q\'를 입력하세요.");
+                            System.out.print("비밀번호 : ");
+                            String password_up = scan_input.nextLine();
+                            if ("q".equalsIgnoreCase(password_up)) {
+                            	UserScreen.printUserViewScreen(currentUserInfo);
+                                break; // 이전 화면으로 돌아가기
+                            }
+                            if (currentUserInfo.getUser_pass().equals(password_up)) {
+                                // 회원수정화면 호출
+                            	currentUserInfo = UserScreen.printUserUpdateScreen(currentUserInfo);
+                                if (currentUserInfo!=null) {
+                                	System.out.println("회원정보가 수정되었습니다.");
+                                	break;
+                                }else {
+                                	System.out.println("회원정보 수정에 실패했습니다.");
+                                	UserScreen.printUserViewScreen(currentUserInfo);
+                                }
+                                
+                                break;
+                            } else {
+                                System.out.println("비밀번호가 올바르지 않습니다.");
+                            }
+                        }
+                        break;
+                    case "2":
+                        while (true) {
+                            //  비밀번호 확인
+                            System.out.println("비밀번호를 입력해주세요.");
+                            System.out.print("비밀번호 : ");
+                            String password_del = scan_input.nextLine();
+                            if ("q".equalsIgnoreCase(password_del)) {
+                                break; // 이전 화면으로 돌아가기
+                            }
+                            if (currentUserInfo.getUser_pass().equals(password_del)) {
+                                // 회원탈퇴 호출
+                                String message = UserScreen.printUserDeleteScreen(currentUserInfo.getUser_no());        
+                                if (message.equals("성공")) {
+                                	System.out.println("회원탈퇴에 성공했습니다.");
+                                	printMainSecreen();	
+                                	break;
+                                }else {
+                                	System.out.println("회원탈퇴에 실패했습니다.");
+                                	UserScreen.printUserViewScreen(currentUserInfo);
+                                    break;
+                                }
+                            } else {
+                                System.out.println("비밀번호가 올바르지 않습니다.");
+							}
+						}
+						break;
+					case "3":
+						System.out.println("이전화면으로 돌아갑니다.");
+						UserScreen.printUserViewScreen(currentUserInfo);
+                        break;
+                        default:
+                        System.out.println("잘못된 입력입니다. 다시 시도해 주세요.");
+                        break;
+                }
+            }
 		case "2":
 			// 게시물 목록
 			BoardScreen.printBoardListScreen(currentUserInfo);
@@ -136,12 +206,12 @@ public class PrintScreen {
 
 	// 로그인 성공 후 화면 for admin
 	public static void printListAfterLoginForAdmin(UserVO currentUserInfo) {
-		PrintScreen.printTitle("[메뉴 - 관리자]");
-		System.out.println("1. 나의 정보 확인");
-		System.out.println("2. 게시물 목록");
-		System.out.println("3. 회원 목록");
-		System.out.println("4. 로그아웃");
-		System.out.println("5. 프로그램 종료");
+	    PrintScreen.printTitle("[메뉴 - 관리자]");
+	    System.out.println("1. 나의 정보 확인");
+	    System.out.println("2. 게시물 목록");
+	    System.out.println("3. 회원 목록");
+	    System.out.println("4. 로그아웃");
+	    System.out.println("5. 프로그램 종료");
 
 		System.out.println();
 		System.out.println("원하는 기능을 선택하십시오.");
@@ -151,7 +221,80 @@ public class PrintScreen {
 		case "1":
 			// 나의 정보 확인
 			UserScreen.printUserViewScreen(currentUserInfo);
+			System.out.println("=".repeat(WIDTH));
+			while (true) {
+				System.out.println("1. 회원 정보수정");
+				System.out.println("2. 회원 탈퇴");
+				System.out.println("3. 이전화면으로");
+				System.out.println();
+				System.out.print("기능 번호 : ");
+				String menu = scan_input.nextLine();
+				switch (menu) {
+				case "1":
+					while (true) {
+						// 유저 비밀번호 확인
+						System.out.println("비밀번호를 입력해주세요.");
+						System.out.println("이전화면으로 돌아가고 싶다면 'q'를 입력하세요.");
+						System.out.print("비밀번호 : ");
+						String password_up = scan_input.nextLine();
+						if ("q".equalsIgnoreCase(password_up)) {
+							UserScreen.printUserViewScreen(currentUserInfo);
+							break; // 이전 화면으로 돌아가기
+						}
+						if (currentUserInfo.getUser_pass().equals(password_up)) {
+							// 회원수정화면 호출
+							currentUserInfo = UserScreen.printUserUpdateScreen(currentUserInfo);
+							if (currentUserInfo != null) {
+								System.out.println("회원정보가 수정되었습니다.");
+								break;
+							} else {
+								System.out.println("회원정보 수정에 실패했습니다.");
+								UserScreen.printUserViewScreen(currentUserInfo);
+							}
+
+							break;
+						} else {
+							System.out.println("비밀번호가 올바르지 않습니다.");
+						}
+					}
+					break;
+				case "2":
+					while (true) {
+						// 비밀번호 확인
+						System.out.println("비밀번호를 입력해주세요.");
+						System.out.print("비밀번호 : ");
+						String password_del = scan_input.nextLine();
+						if ("q".equalsIgnoreCase(password_del)) {
+							break; // 이전 화면으로 돌아가기
+						}
+						if (currentUserInfo.getUser_pass().equals(password_del)) {
+							// 회원탈퇴 호출
+							String message = UserScreen.printUserDeleteScreen(currentUserInfo.getUser_no());
+							if (message.equals("성공")) {
+								System.out.println("회원탈퇴에 성공했습니다.");
+								printMainSecreen();
+								break;
+							} else {
+								System.out.println("회원탈퇴에 실패했습니다.");
+								UserScreen.printUserViewScreen(currentUserInfo);
+								break;
+							}
+						} else {
+							System.out.println("비밀번호가 올바르지 않습니다.");
+						}
+					}
+					break;
+				case "3":
+					System.out.println("이전화면으로 돌아갑니다.");
+					UserScreen.printUserListScreen(currentUserInfo);
+					break;
+				default:
+					System.out.println("잘못된 입력입니다. 다시 시도해 주세요.");
+					break;
+				}
+			
 			break;
+			}
 
 		case "2":
 			// 게시물 목록
@@ -182,76 +325,100 @@ public class PrintScreen {
 	}
 
 	public static void isMyBoard(UserVO currentUserInfo, BoardVO boardView) {
-        System.out.println();
-        System.out.println();
+	    System.out.println();
+	    System.out.println();
+	    
+	    // 내 게시물일 경우
+	    if (boardView.getUser_no() == currentUserInfo.getUser_no() || "admin".equals(currentUserInfo.getUser_role())) {
+	        while (true) {
+	            System.out.println("1. [" + boardView.getBoard_title() + "] 게시물 수정");
+	            System.out.println("2. [" + boardView.getBoard_title() + "] 게시물 삭제");
+	            System.out.println("3. 다른 게시물 선택");
+	            System.out.println();
+	            System.out.print("기능 번호 : ");
+	            String choice = scan_input.nextLine();
+	            switch (choice) {
+	                case "1":
+	                    if ("admin".equals(currentUserInfo.getUser_role())) {
+	                        // 관리자일 경우 비밀번호 확인 없이 바로 수정 화면으로
+	                        String message = BoardScreen.printBoardUpdateScreen(boardView);
+	                        if (message.equals("성공")) {
+	                            System.out.println("게시물이 수정되었습니다.");
+	                            BoardScreen.printBoardViewScreen(String.valueOf(boardView.getBoard_no()));
+	                        } else {
+	                            System.out.println("게시물 수정에 실패했습니다.");
+	                        }
+	                    } else {
+	                        // 비밀번호 확인 절차
+	                        while (true) {
+	                            System.out.println("비밀번호를 입력해주세요.");
+	                            System.out.println("이전화면으로 돌아가고 싶다면 'q'를 입력하세요.");
+	                            System.out.print("비밀번호 : ");
+	                            String password_up = scan_input.nextLine();
+	                            if ("q".equalsIgnoreCase(password_up)) {
+	                                break; // 이전 화면으로 돌아가기
+	                            }
+	                            if (boardView.getBoard_pass().equals(password_up)) {
+	                                String message = BoardScreen.printBoardUpdateScreen(boardView);
+	                                if (message.equals("성공")) {
+	                                    System.out.println("게시물이 수정되었습니다.");
+	                                    BoardScreen.printBoardViewScreen(String.valueOf(boardView.getBoard_no()));
+	                                } else {
+	                                    System.out.println("게시물 수정에 실패했습니다.");
+	                                }
+	                                break;
+	                            } else {
+	                                System.out.println("비밀번호가 올바르지 않습니다.");
+	                            }
+	                        }
+	                    }
+	                    break;
+	                case "2":
+	                    if ("admin".equals(currentUserInfo.getUser_role())) {
+	                        // 관리자일 경우 비밀번호 확인 없이 바로 삭제
+	                        String message = BoardScreen.printBoardDeleteScreen(boardView);
+	                        if (message.equals("성공")) {
+	                            System.out.println("게시물이 삭제되었습니다.");
+	                            BoardScreen.printBoardListScreen(currentUserInfo);
+	                        } else {
+	                            System.out.println("게시물 삭제에 실패했습니다.");
+	                            BoardScreen.printBoardListScreen(currentUserInfo);
+	                        }
+	                    } else {
+	                        // 비밀번호 확인 절차
+	                        while (true) {
+	                            System.out.println("비밀번호를 입력해주세요.");
+	                            System.out.print("비밀번호 : ");
+	                            String password_del = scan_input.nextLine();
+	                            if ("q".equalsIgnoreCase(password_del)) {
+	                                break; // 이전 화면으로 돌아가기
+	                            }
+	                            if (boardView.getBoard_pass().equals(password_del)) {
+	                                String message = BoardScreen.printBoardDeleteScreen(boardView);
+	                                if (message.equals("성공")) {
+	                                    System.out.println("게시물이 삭제되었습니다.");
+	                                    BoardScreen.printBoardListScreen(currentUserInfo);
+	                                } else {
+	                                    System.out.println("게시물 삭제에 실패했습니다.");
+	                                    BoardScreen.printBoardListScreen(currentUserInfo);
+	                                }
+	                                break;
+	                            } else {
+	                                System.out.println("비밀번호가 올바르지 않습니다.");
+	                            }
+	                        }
+	                    }
+	                    break;
+	                case "3":
+	                    System.out.println("게시물 목록으로 돌아갑니다.");
+	                    BoardScreen.printBoardListScreen(currentUserInfo);
+	                    break;
+	                default:
+	                    System.out.println("잘못된 입력입니다. 다시 시도해 주세요.");
+	                    break;
+	            }
+	        }
+	    }
+	}
 
-        // 내 게시물일 경우
-        if (boardView.getBoard_no() == currentUserInfo.getUser_no()) {
-            while (true) {
-                System.out.println("1. [" + boardView.getBoard_title() + "] 게시물 수정");
-                System.out.println("2. [" + boardView.getBoard_title() + "] 게시물 삭제");
-                System.out.println("3. 다른 게시물 선택");
-                System.out.println();
-                System.out.print("기능 번호 : ");
-                String choice = scan_input.nextLine();
-                switch (choice) {
-                    case "1":
-                        while (true) {
-                            // 게시물 비밀번호 확인
-                            System.out.println("비밀번호를 입력해주세요.");
-                            System.out.println("이전화면으로 돌아가고 싶다면 \'q\'를 입력하세요.");
-                            System.out.print("비밀번호 : ");
-                            String password_up = scan_input.nextLine();
-                            if ("q".equalsIgnoreCase(password_up)) {
-                                break; // 이전 화면으로 돌아가기
-                            }
-                            if (boardView.getBoard_pass().equals(password_up)) {
-                                // 게시물 수정 화면 출력
-                                String message = BoardScreen.printBoardUpdateScreen(boardView);
-                                if (message.equals("성공")) {
-                                	System.out.println("게시물이 수정되었습니다.");
-                                }else {
-                                	System.out.println("게시물 수정에 실패했습니다.");
-                                }
-                                
-                                break;
-                            } else {
-                                System.out.println("비밀번호가 올바르지 않습니다.");
-                            }
-                        }
-                        break;
-                    case "2":
-                        while (true) {
-                            // 게시물 비밀번호 확인
-                            System.out.println("비밀번호를 입력해주세요.");
-                            System.out.print("비밀번호 : ");
-                            String password_del = scan_input.nextLine();
-                            if ("q".equalsIgnoreCase(password_del)) {
-                                break; // 이전 화면으로 돌아가기
-                            }
-                            if (boardView.getBoard_pass().equals(password_del)) {
-                                // 게시물 삭제 호출
-                                String message = BoardScreen.printBoardDeleteScreen(boardView);
-                                
-                                if (message.equals("성공")) {
-                                	System.out.println("게시물이 삭제되었습니다.");
-                                }else {
-                                	System.out.println("게시물 삭제에 실패했습니다.");
-                                }
-                                break;
-                            } else {
-                                System.out.println("비밀번호가 올바르지 않습니다.");
-                            }
-                        }
-                        break;
-                    case "3":
-                        System.out.println("기능 선택으로 돌아갑니다.");
-                        return; // 기능 선택으로 돌아감
-                    default:
-                        System.out.println("잘못된 입력입니다. 다시 시도해 주세요.");
-                        break;
-                }
-            }
-        }
-    }
 }

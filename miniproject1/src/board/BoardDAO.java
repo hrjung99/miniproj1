@@ -64,7 +64,7 @@ public class BoardDAO {
 					B.USER_NO,
 					U.USER_NAME AS BOARD_WRITER,
 					B.BOARD_TITLE, B.BOARD_CONTENT,
-					B.BOARD_VIEW_CNT, B.BOARD_REG_DATE
+					B.BOARD_VIEW_CNT, B.BOARD_REG_DATE, B.BOARD_PASS
 					FROM TB_BOARD B
 					JOIN TB_USER U ON B.USER_NO = U.USER_NO
 					WHERE B.BOARD_NO = ?
@@ -157,9 +157,14 @@ public class BoardDAO {
 				ResultSet rs = boardViewPsmt.executeQuery();
 
 				if (rs.next()) {
-					board = new BoardVO(rs.getInt("board_no"), rs.getString("board_writer"),
-							rs.getString("board_title"), rs.getString("board_content"), rs.getInt("board_view_cnt"),
-							rs.getString("board_reg_date"));
+					board = new BoardVO(rs.getInt("board_no")
+							,rs.getInt("user_no")
+							, rs.getString("board_writer")
+							, rs.getString("board_title")
+							, rs.getString("board_content")
+							, rs.getInt("board_view_cnt")
+							, rs.getString("board_reg_date")
+							,rs.getString("board_pass"));
 				}
 
 			} else {

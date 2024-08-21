@@ -203,6 +203,7 @@ public class UserScreen {
 		currentUserInfo = UserDAO.userView(String.valueOf(currentUserInfo.getUser_no()));
 		// 조회된 사용자 정보를 화면에 출력
 		if (currentUserInfo != null) {
+			System.out.println("회원번호        : " + currentUserInfo.getUser_no());
 			System.out.println("아이디        : " + currentUserInfo.getUser_id());
 			System.out.println("이름         : " + currentUserInfo.getUser_name());
 			System.out.println("전화번호       : " + currentUserInfo.getUser_phone());
@@ -210,12 +211,7 @@ public class UserScreen {
 			System.out.println("성별          : " + currentUserInfo.getUser_sex());
 			System.out.println("최근 로그인     : " + currentUserInfo.getUser_login_recent());
 			System.out.println("최근 로그아웃   : " + currentUserInfo.getUser_logout_recent());
-			if (currentUserInfo.getUser_role().equalsIgnoreCase("admin")) {
-				PrintScreen.printListAfterLoginForAdmin(currentUserInfo);
-			} else {
-				PrintScreen.printListAfterLogin(currentUserInfo);
-			}
-
+			System.out.println();
 		} else {
 			System.out.println("오류 : 사용자 정보를 조회할 수 없습니다.");
 		}
@@ -305,54 +301,68 @@ public class UserScreen {
 
 	// 회원 탈퇴 화면
 	public static String printUserDeleteScreen(int user_no) {
-		String message = UserDAO.userDelete(userInfo.getUser_no());
+		String message = UserDAO.userDelete(user_no);
 		return message;
 	}
 
 	// 회원 수정 화면
-	public static void printUserUpdateScreen(UserVO user) {
-		UserVO newUserInfo = new UserVO();
+	public static UserVO printUserUpdateScreen(UserVO user) {
 		PrintScreen.printTitle("[" + user.getUser_name() + " 님의 회원 정보 수정]");
 
-		while (true) {
-			System.out.println();
-			System.out.println("비밀번호를 입력해 주세요.");
-			System.out.println("비밀번호 : ");
-			input = scan_input.nextLine();
+		// 기존 사용자 정보를 보여줌
+		System.out.println("기존 아이디: " + user.getUser_id());
+		System.out.println("기존 비밀번호: ********"); // 비밀번호는 보통 숨깁니다.
+		System.out.println("기존 이름: " + user.getUser_name());
+		System.out.println("기존 전화번호: " + user.getUser_phone());
+		System.out.println("기존 주소: " + user.getUser_addr());
+		System.out.println("기존 성별: " + user.getUser_sex());
+		System.out.println();
 
-			if (input.equals(user.getUser_pass())) {
-				System.out.println("비밀번호 일치");
-				System.out.println();
-				System.out.print("아이디 : " + user.getUser_id());
-				newUserInfo.setUser_id(user.getUser_id());
-
-				System.out.print("비밀번호 : ");
-				input = scan_input.nextLine();
-				newUserInfo.setUser_pass(input);
-
-				System.out.print("이름 : " + user.getUser_name());
-				newUserInfo.setUser_name(user.getUser_name());
-
-				System.out.println("전화번호 입력 시 \"-\"를 제외하고 숫자만 입력하십시오.");
-				System.out.print("전화번호 : ");
-				input = scan_input.nextLine();
-				newUserInfo.setUser_phone(etcMethod.formatPhoneNumber(input));
-
-				System.out.println("주소 입력 예시 :  \"서울특별시 강서구 화곡동\"");
-				System.out.print("주소 : ");
-				input = scan_input.nextLine();
-				newUserInfo.setUser_addr(input);
-
-				System.out.println("성별 입력 예시 :  \"남\", \"여\" 중 선택");
-				System.out.print("성별 : " + user.getUser_sex());
-				newUserInfo.setUser_sex(newUserInfo.getUser_sex());
-				break;
-			} else {
-				System.out.println("비밀번호가 일치하지 않습니다.");
-			}
+		// 새로운 정보를 입력받음
+		System.out.print("새로운 비밀번호 (변경하지 않으려면 Enter): ");
+		String newPassword = scan_input.nextLine();
+		if (newPassword.isEmpty()) {
+			newPassword = user.getUser_pass();
 		}
 
-	}
+		System.out.print("새로운 이름 (변경하지 않으려면 Enter): ");
+		String newName = scan_input.nextLine();
+		if (newName.isEmpty()) {
+			newName = user.getUser_name();
+		}
+
+		System.out.println("전화번호 입력 시 \"-\"를 제외하고 숫자만 입력하십시오.");
+		System.out.print("새로운 전화번호 (변경하지 않으려면 Enter): ");
+		String newPhone = scan_input.nextLine();
+		if (newPhone.isEmpty()) {
+			newPhone = user.getUser_phone();
+		} else {
+			newPhone = etcMethod.formatPhoneNumber(newPhone);
+		}
+
+		System.out.println("주소 입력 예시: \"서울특별시 강서구 화곡동\"");
+		System.out.print("새로운 주소 (변경하지 않으려면 Enter): ");
+		String newAddr = scan_input.nextLine();
+		if (newAddr.isEmpty()) {
+			newAddr = user.getUser_addr();
+		}
+
+		// 수정된 정보를 담을 새로운 UserVO 객체 생성
+		UserVO updatedUser = new UserVO();
+		updatedUser.setUser_id(user.getUser_id());
+		updatedUser.setUser_pass(newPassword);
+		updatedUser.setUser_name(newName);
+		updatedUser.setUser_phone(newPhone);
+		updatedUser.setUser_addr(newAddr);
+		updatedUser.setUser_no(user.getUser_no());
+
+		// 사용자 정보를 업데이트하고 결과 메시지 반환
+		UserDAO.userUpdate(updatedUser);
+		UserVO newUserInfo = UserDAO.userView(String.valueOf(user.getUser_no()));
+				
+		return newUserInfo;
+		}
+
 
 	// 로그인
 	public static void printLoginScreen() {
@@ -378,6 +388,14 @@ public class UserScreen {
 			// 1 일 경우 로그인 시도
 			case "1":
 				userInfo = UserDAO.userLogin(inputId);
+				 if (userInfo == null || userInfo.getUser_id() == null) {
+	                    System.out.println("아이디 혹은 비밀번호가 유효하지 않습니다.");
+	                    System.out.println("로그인 정보를 다시 입력해 주세요.");
+	                    System.out.println();
+	                    break;
+	                }
+				 
+				//그게 아니라면(else) 로그인 진행
 				String user_id = userInfo.getUser_id();
 				String user_pass = userInfo.getUser_pass();
 
