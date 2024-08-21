@@ -73,6 +73,7 @@ public class BoardScreen {
 		    if (board_no.equalsIgnoreCase("q")) {
 		        // 이전 화면으로 이동
 		        System.out.println("이전 화면으로 이동합니다.");
+			    System.out.println("=".repeat(width));
 		        if (currentUserInfo.getUser_role().equals("admin")) {
 		            PrintScreen.printListAfterLoginForAdmin(currentUserInfo);
 		        } else if (currentUserInfo.getUser_role().equals("user")) {
@@ -85,6 +86,9 @@ public class BoardScreen {
 		        String message = BoardScreen.printBoardInsertScreen(currentUserInfo);
 		        if (message.equals("성공")) {
 		        	System.out.println("게시물 등록에 성공했습니다.");
+				    System.out.println("=".repeat(width));
+		        	printBoardListScreen(currentUserInfo);
+		        	break;
 		        } else {
 		        	System.out.println("게시물 등록을 실패했습니다.");
 		        }

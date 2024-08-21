@@ -153,10 +153,6 @@ public class PrintScreen {
 			UserScreen.printUserViewScreen(currentUserInfo);
 			break;
 
-		// case 3
-		// 회원 목록
-		// printUserListScreen() 함수 호출
-
 		case "2":
 			// 게시물 목록
 			BoardScreen.printBoardListScreen(currentUserInfo);
@@ -180,7 +176,7 @@ public class PrintScreen {
 		default:
 			// 잘못된 선택
 			System.out.println("잘못된 선택입니다. 다시 선택해 주세요.");
-			printListAfterLogin(currentUserInfo); // 잘못된 선택 시 다시 화면 표시
+			printListAfterLoginForAdmin(currentUserInfo); // 잘못된 선택 시 다시 화면 표시
 			break;
 		}
 	}
