@@ -200,6 +200,7 @@ public class UserScreen {
 // 마이페이지 화면
 	public static void printUserViewScreen(UserVO currentUserInfo) {
 		PrintScreen.printTitle("[나의 정보 확인]");
+		currentUserInfo = UserDAO.userView(String.valueOf(currentUserInfo.getUser_no()));
 		// 조회된 사용자 정보를 화면에 출력
 		if (currentUserInfo != null) {
 			System.out.println("아이디        : " + currentUserInfo.getUser_id());
